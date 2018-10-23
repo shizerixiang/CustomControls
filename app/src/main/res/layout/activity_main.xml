@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:id="@+id/editInput"
+        android:layout_width="match_parent"
+        android:textSize="14sp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:hint="@string/str_search"
+        android:inputType="text" />
+
+    <com.beviswang.customcontrols.widget.ScrollerLayout
+        android:id="@+id/acct"
+        android:layout_width="300dp"
+        android:layout_height="104dp"
+        android:background="#eee"
+        android:elevation="4dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_drag_handle"
+            android:textSize="12sp" />
+
+        <View
+            android:id="@+id/headerBar"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_marginStart="80dp"
+            android:background="#eee"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <com.beviswang.customcontrols.widget.WaveView
+            android:id="@+id/waveView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/headerBar" />
+
+        <com.beviswang.customcontrols.widget.TemplateViewGroup
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:layout_below="@id/headerBar">
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle1"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#afff" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle2"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#aff0" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle3"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#af00" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle4"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#a000" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle5"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#a00f" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle6"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#a0ff" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle7"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#a0f0" />
+
+        </com.beviswang.customcontrols.widget.TemplateViewGroup>
+
+    </com.beviswang.customcontrols.widget.ScrollerLayout>
+
+</RelativeLayout>

@@ -1,0 +1,42 @@
+/*
+ * A gradle config for version control.
+ * @author BevisWang
+ */
+ext {
+    android_support_version = '27.1.1'
+    kotlin_version = '1.2.30'
+    anko_version = '0.9.1'
+
+    android = [
+            // About AAPT2 error:The compileSdkVersion if too low, AAPT2 will be error,We can close the AAPT2
+            // Add android.enableAapt2=false in gradle.properties file.
+            // You must know that this problem is likely to be a problem with your code.
+            compileSdkVersion        : 27,
+            applicationId            : "com.beviswang.customcontrols",
+            minSdkVersion            : 21,
+            targetSdkVersion         : 27,
+            versionCode              : 1,
+            versionName              : "1.0",
+            testInstrumentationRunner: "android.support.test.runner.AndroidJUnitRunner"
+    ]
+
+    dependencies = [
+            // Google android support dependencies
+            appcompat_v7      : "com.android.support:appcompat-v7:$android_support_version",
+            support_v4        : "com.android.support:support-v4:$android_support_version",
+            support_v13       : "com.android.support:support-v13:$android_support_version",
+            design            : "com.android.support:design:$android_support_version",
+            espresso_core     : 'com.android.support.test.espresso:espresso-core:3.0.1',
+            runner            : 'com.android.support.test:runner:1.0.1',
+            junit             : 'junit:junit:4.12',
+            // Kotlin tools dependencies
+            kotlin_stdlib_jre7: "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version",
+            kotlin_reflect    : "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version",
+            anko_sdk15        : "org.jetbrains.anko:anko-sdk15:$anko_version",
+            // User custom dependencies
+            amap_search       : "com.amap.api:search:5.7.0",
+            LogCapture        : "com.github.shizerixiang:LogCapture:v1.0.0",
+            CompressJpeg      : "com.github.shizerixiang:CompressJpeg:v1.0.0",
+            RealmEx           : "com.github.vicpinm:krealmextensions:2.2.0"
+    ]
+}
