@@ -9,12 +9,12 @@
     <EditText
         android:id="@+id/editInput"
         android:layout_width="match_parent"
-        android:textSize="14sp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:hint="@string/str_search"
-        android:inputType="text" />
+        android:inputType="text"
+        android:textSize="14sp" />
 
     <com.beviswang.customcontrols.widget.ScrollerLayout
         android:id="@+id/acct"
@@ -107,6 +107,52 @@
                 app:circle_color="#a0f0" />
 
         </com.beviswang.customcontrols.widget.TemplateViewGroup>
+
+    </com.beviswang.customcontrols.widget.ScrollerLayout>
+
+    <com.beviswang.customcontrols.widget.ScrollerLayout
+        android:layout_width="300dp"
+        android:layout_height="104dp"
+        android:layout_margin="24dp"
+        android:background="#eee"
+        android:elevation="4dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_drag_handle"
+            android:textSize="12sp" />
+
+        <View
+            android:id="@+id/headerBar2"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_marginStart="80dp"
+            android:background="#eee"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <com.beviswang.customcontrols.widget.WaveView
+            android:id="@+id/waveView2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/headerBar2" />
+
+        <com.beviswang.customcontrols.widget.TabView
+            android:id="@+id/mTxt1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/headerBar2"
+            android:background="#ccc" />
+
+        <Button
+            android:id="@+id/zoomBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:text="放大" />
 
     </com.beviswang.customcontrols.widget.ScrollerLayout>
 
