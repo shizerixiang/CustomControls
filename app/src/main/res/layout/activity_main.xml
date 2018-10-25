@@ -143,8 +143,7 @@
             android:id="@+id/mTxt1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/headerBar2"
-            android:background="#ccc" />
+            android:layout_below="@id/headerBar2" />
 
         <Button
             android:id="@+id/zoomBtn"

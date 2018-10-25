@@ -8,9 +8,7 @@ import android.widget.RelativeLayout
 import com.beviswang.customcontrols.util.KeyboardHeightProvider
 import com.beviswang.customcontrols.util.ViewHelper
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.alignParentBottom
-import org.jetbrains.anko.centerHorizontally
-import org.jetbrains.anko.onClick
+import org.jetbrains.anko.*
 
 class MainActivity : AppCompatActivity(), KeyboardHeightProvider.KeyboardHeightObserver {
     private var mKeyboardHeightProvider: KeyboardHeightProvider? = null
@@ -29,15 +27,23 @@ class MainActivity : AppCompatActivity(), KeyboardHeightProvider.KeyboardHeightO
             waveView2.startWave()
         }
 
-        zoomBtn.onClick {
-            mTxt1.setTextSize(ViewHelper.sp2px(this@MainActivity,24f))
+        mTxt1.setSelectTextSize(ViewHelper.sp2px(this@MainActivity, 24f))
+        zoomBtn.onClick { _ ->
+            doAsync {
+                (0..1000).forEach { it ->
+                    uiThread { _ ->
+                        mTxt1.setScrollScale(it / 1000f)
+                    }
+                    Thread.sleep(10)
+                }
+            }
         }
 
         mTxt1.onClick {
-            mTxt1.setTextSize(ViewHelper.sp2px(this@MainActivity,14f))
+            mTxt1.startRippleAnimation()
         }
 
-        mTxt1.setText("快速扩大gdF4")
+        mTxt1.setText("推荐")
         mTxt1.setTextAlign(Paint.Align.LEFT)
     }
 
