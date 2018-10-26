@@ -1,11 +1,9 @@
 package com.beviswang.customcontrols.widget
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import org.jetbrains.anko.doAsync
 import java.util.*
@@ -32,6 +30,10 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
     private var isRunningAnimator: Boolean = false
     // 控制整个控件的缩放比例
     private var mScrollScale: Float = 0f
+    // 记录上次的随机值，方便放大时保证波纹的一致性
+    private var mRandomArray: Array<Int> = Array(20, init = { 0 })
+    // 是否重绘波纹幅度，是则波纹幅度随机分配，否则波纹幅度保留上次的值
+    private var mIsRepaint: Boolean = false
 
     init {
         setTextPaint(context)
@@ -71,7 +73,8 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
 
     /** 计算适应内容的默认大小 */
     private fun computeDefSize() {
-        mDefHeight = (mCurTextSize + mTextPaint.fontMetrics.descent).toInt() + paddingTop + paddingBottom
+        mDefHeight = (mCurTextSize + mTextPaint.fontMetrics.descent).toInt() +
+                paddingTop + paddingBottom
         mDefWidth = mTextPaint.measureText(mText).toInt() + paddingStart + paddingEnd
         // 加入线条区域高度
         mDefHeight += mLineBoxHeight
@@ -79,13 +82,18 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
 
     /** @param scale 设置缩放尺寸 */
     override fun setScrollScale(scale: Float) {
+        if (isRunningAnimator || mIsRepaint) {
+            mIsRepaint = false
+            isRunningAnimator = false
+        }
         mScrollScale = scale
-        val dSize = if (mSelectedTextSize != 0f)
-            mSelectedTextSize - mNormalTextSize
-        else mNormalTextSize
-        mCurTextSize += dSize * mScrollScale
-        Log.e("aa","size: $mCurTextSize px")
-        setTextSize(mCurTextSize)
+        // 默认缩放为两倍普通字体大小
+        if (mSelectedTextSize == 0f) mSelectedTextSize = 2 * mNormalTextSize
+        mCurTextSize = if (mScrollScale != 1f) (mSelectedTextSize - mNormalTextSize) *
+                mScrollScale + mNormalTextSize
+        else mSelectedTextSize
+        // 计算后的 View 重绘
+        setCurTextSize(mCurTextSize)
     }
 
     override fun setText(text: String) {
@@ -93,14 +101,8 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
         postInvalidate()
     }
 
-    /** @param color 设置文字颜色 */
-    fun setTextColor(@ColorInt color: Int): TabView {
-        mTextPaint.color = color
-        return this@TabView
-    }
-
     /** @param size 设置文字大小 */
-    fun setTextSize(size: Float): TabView {
+    override fun setTextSize(size: Float): TabView {
         mCurTextSize = size
         mNormalTextSize = size
         mTextPaint.textSize = mCurTextSize
@@ -109,22 +111,46 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
     }
 
     /** @param size 设置文字选中后的大小 */
-    fun setSelectTextSize(size: Float): TabView {
+    override fun setSelectTextSize(size: Float): TabView {
         mSelectedTextSize = size
         return this@TabView
     }
 
+    /** @param color 设置文字颜色 */
+    override fun setTextColor(@ColorInt color: Int): TabView {
+        mTextPaint.color = color
+        return this@TabView
+    }
+
+    /** @param color 设置波纹线条颜色 */
+    override fun setLineColor(@ColorInt color: Int): TabView {
+        mLinePaint.color = color
+        return this@TabView
+    }
+
     /** 开启波纹抖动动画 */
-    fun startRippleAnimation() {
+    override fun startTabAnimation() {
         if (isRunningAnimator) return
         doAsync {
             isRunningAnimator = true
+            mIsRepaint = true
             (0..8).forEach {
+                if (!isRunningAnimator) {
+                    mIsRepaint = false
+                }
                 postInvalidate()
                 Thread.sleep(100)
             }
+            mIsRepaint = false
             isRunningAnimator = false
         }
+    }
+
+    /** 设置当前文字大小，调整整个容器 */
+    private fun setCurTextSize(size: Float) {
+        mCurTextSize = size
+        mTextPaint.textSize = mCurTextSize
+        resize()
     }
 
     /** 重新设置大小 */
@@ -156,10 +182,10 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
     private fun drawText(canvas: Canvas?) {
         val textStartY = mCurTextSize
         val textStartX = when (mTextAlign) {
-            Paint.Align.LEFT -> paddingStart + x
-            Paint.Align.CENTER -> width / 2f + x
-            Paint.Align.RIGHT -> width - paddingEnd + x
-            else -> x
+            Paint.Align.LEFT -> paddingStart.toFloat()
+            Paint.Align.CENTER -> width / 2f
+            Paint.Align.RIGHT -> width - paddingEnd.toFloat()
+            else -> 0f
         }
         canvas?.drawText(mText, textStartX, textStartY, mTextPaint)
     }
@@ -172,19 +198,32 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
         mLinePath.moveTo(0f, lineY)
         val random = Random()
         var index = 0
+        if (mSelectedTextSize == 0f) mSelectedTextSize = 2 * mNormalTextSize
         (1..20).forEach {
-            val dy = when {
-                it < 5 -> dip2px(context, random.nextInt((px2sp(context, mCurTextSize) / 8).toInt()) + 1f).toInt()
-                it < 9 -> dip2px(context, random.nextInt((px2sp(context, mCurTextSize) / 4).toInt()) + 1.5f).toInt()
-                it < 15 -> dip2px(context, random.nextInt((px2sp(context, mCurTextSize) / 2.4f).toInt()) + 4f).toInt()
-                it < 17 -> dip2px(context, random.nextInt((px2sp(context, mCurTextSize) / 4).toInt()) + 1.5f).toInt()
-                else -> dip2px(context, random.nextInt((px2sp(context, mCurTextSize) / 8).toInt()) + 1f).toInt()
+            // 计算随机波纹幅度
+            if (mRandomArray[it - 1] == 0 || mIsRepaint) {
+                mRandomArray[it - 1] = when {
+                    it < 3 -> dip2px(context, random.nextInt((px2sp(context,
+                            mSelectedTextSize) / 8).toInt()) + 1f).toInt()
+                    it < 7 -> dip2px(context, random.nextInt((px2sp(context,
+                            mSelectedTextSize) / 6).toInt()) + 2f).toInt()
+                    it < 15 -> dip2px(context, random.nextInt((px2sp(context,
+                            mSelectedTextSize) / 3).toInt()) + 3f).toInt()
+                    it < 17 -> dip2px(context, random.nextInt((px2sp(context,
+                            mSelectedTextSize) / 6).toInt()) + 2f).toInt()
+                    else -> dip2px(context, random.nextInt((px2sp(context,
+                            mSelectedTextSize) / 8).toInt()) + 1f).toInt()
+                }
+            } else {
+
             }
             index = it * 2
             if (it % 2 == 0)
-                mLinePath.quadTo(lineXPart * (index - 1), lineY + dy, lineXPart * index, lineY)
+                mLinePath.quadTo(lineXPart * (index - 1), lineY + (mRandomArray[it - 1] *
+                        (mScrollScale + 0.5f)), lineXPart * index, lineY)
             else
-                mLinePath.quadTo(lineXPart * (index - 1), lineY - dy, lineXPart * index, lineY)
+                mLinePath.quadTo(lineXPart * (index - 1), lineY - (mRandomArray[it - 1] *
+                        (mScrollScale + 0.5f)), lineXPart * index, lineY)
         }
         mLinePath.moveTo(width.toFloat(), lineY)
         canvas?.drawPath(mLinePath, mLinePaint)
