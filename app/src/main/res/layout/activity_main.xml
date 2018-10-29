@@ -21,6 +21,8 @@
         android:layout_width="300dp"
         android:layout_height="104dp"
         android:background="#eee"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
         android:elevation="4dp">
 
         <ImageView
@@ -113,8 +115,9 @@
     <com.beviswang.customcontrols.widget.ScrollerLayout
         android:layout_width="300dp"
         android:layout_height="104dp"
-        android:layout_margin="24dp"
-        android:background="#eee"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:background="#fff"
         android:elevation="4dp">
 
         <ImageView
@@ -129,76 +132,19 @@
             android:layout_width="match_parent"
             android:layout_height="24dp"
             android:layout_marginStart="80dp"
-            android:background="#eee"
+            android:background="#fff"
             android:clickable="true"
             android:focusable="true" />
-
-        <com.beviswang.customcontrols.widget.WaveView
-            android:id="@+id/waveView2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/headerBar2" />
-
-        <com.beviswang.customcontrols.widget.TabView
-            android:id="@+id/mTxt1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/headerBar2" />
-
-        <Button
-            android:id="@+id/zoomBBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:text="放大" />
-
-        <Button
-            android:id="@+id/zoomSBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toStartOf="@id/zoomBBtn"
-            android:text="缩小" />
-
-    </com.beviswang.customcontrols.widget.ScrollerLayout>
-
-    <com.beviswang.customcontrols.widget.ScrollerLayout
-        android:layout_width="300dp"
-        android:layout_height="104dp"
-        android:layout_margin="48dp"
-        android:background="#eee"
-        android:elevation="4dp">
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_drag_handle"
-            android:textSize="12sp" />
-
-        <View
-            android:id="@+id/headerBar3"
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:layout_marginStart="80dp"
-            android:background="#eee"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <com.beviswang.customcontrols.widget.WaveView
-            android:id="@+id/waveView3"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/headerBar3" />
 
         <com.beviswang.customcontrols.widget.ZoomTabLayout
             android:id="@+id/zoomTabLayout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_below="@id/headerBar3"
+            android:layout_below="@id/headerBar2"
             android:gravity="bottom"
-            android:orientation="horizontal" />
+            android:orientation="horizontal"
+            android:paddingEnd="146dp"
+            android:paddingStart="26dp" />
 
     </com.beviswang.customcontrols.widget.ScrollerLayout>
 

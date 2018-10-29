@@ -34,6 +34,9 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
     private var mRandomArray: Array<Int> = Array(20, init = { 0 })
     // 是否重绘波纹幅度，是则波纹幅度随机分配，否则波纹幅度保留上次的值
     private var mIsRepaint: Boolean = false
+    // 记录本次计算中的尺寸变化差值，值为 0 时，表示本次尺寸变化
+    private var mOffsetWidth = 0
+    private var mWidthChangedListener: (offsetWidth: Int) -> Unit = {}
 
     init {
         setTextPaint(context)
@@ -75,9 +78,18 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
     private fun computeDefSize() {
         mDefHeight = (mCurTextSize + mTextPaint.fontMetrics.descent).toInt() +
                 paddingTop + paddingBottom
-        mDefWidth = mTextPaint.measureText(mText).toInt() + paddingStart + paddingEnd
         // 加入线条区域高度
         mDefHeight += mLineBoxHeight
+        if (mOffsetWidth == 0) {
+            val defWidth = mTextPaint.measureText(mText).toInt() + paddingStart + paddingEnd
+            val offsetWidth = defWidth - mDefWidth
+            mDefWidth = defWidth
+            if (offsetWidth != 0)
+                mWidthChangedListener(offsetWidth)
+        } else {
+            mDefWidth += mOffsetWidth
+            mOffsetWidth = 0
+        }
     }
 
     /** @param scale 设置缩放尺寸 */
@@ -94,6 +106,14 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
         else mSelectedTextSize
         // 计算后的 View 重绘
         setCurTextSize(mCurTextSize)
+    }
+
+    override fun addWidthChangedListener(listener: (offsetWidth: Int) -> Unit) {
+        mWidthChangedListener = listener
+    }
+
+    override fun setOffsetWidth(offsetWidth: Int) {
+        mOffsetWidth = offsetWidth
     }
 
     override fun setText(text: String) {
@@ -193,9 +213,10 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
     /** 绘制底部图形 */
     private fun drawLine(canvas: Canvas?) {
         val lineY = height - (mLineBoxHeight - dip2px(context, 1f))
-        val lineXPart = width / 40f
+        val waveWidth = width - paddingStart - paddingEnd
+        val lineXPart = waveWidth / 40f
         val mLinePath = Path()
-        mLinePath.moveTo(0f, lineY)
+        mLinePath.moveTo(paddingStart.toFloat(), lineY)
         val random = Random()
         var index = 0
         if (mSelectedTextSize == 0f) mSelectedTextSize = 2 * mNormalTextSize
@@ -219,14 +240,16 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
             }
             index = it * 2
             if (it % 2 == 0)
-                mLinePath.quadTo(lineXPart * (index - 1), lineY + (mRandomArray[it - 1] *
-                        (mScrollScale + 0.5f)), lineXPart * index, lineY)
+                mLinePath.quadTo(lineXPart * (index - 1) + paddingStart, lineY + (mRandomArray[it - 1] *
+                        (mScrollScale + 0.5f)), lineXPart * index + paddingStart, lineY)
             else
-                mLinePath.quadTo(lineXPart * (index - 1), lineY - (mRandomArray[it - 1] *
-                        (mScrollScale + 0.5f)), lineXPart * index, lineY)
+                mLinePath.quadTo(lineXPart * (index - 1) + paddingStart, lineY - (mRandomArray[it - 1] *
+                        (mScrollScale + 0.5f)), lineXPart * index + paddingStart, lineY)
         }
-        mLinePath.moveTo(width.toFloat(), lineY)
+        mLinePath.moveTo((width - paddingEnd).toFloat(), lineY)
         canvas?.drawPath(mLinePath, mLinePaint)
+        canvas?.drawLine(0f, lineY, paddingStart.toFloat(), lineY, mLinePaint)
+        canvas?.drawLine((width - paddingEnd).toFloat(), lineY, width.toFloat(), lineY, mLinePaint)
     }
 
     /** dp 转 px */

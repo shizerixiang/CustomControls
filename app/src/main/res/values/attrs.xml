@@ -4,4 +4,18 @@
     <declare-styleable name="TemplateView">
         <attr name="circle_color" format="color" />
     </declare-styleable>
+
+    <!-- 缩放 TabLayout 的自定义属性 -->
+    <declare-styleable name="ZoomTabLayout">
+        <!-- 选中文字大小 -->
+        <attr name="tabSelectTextSize" format="integer|dimension" />
+        <!-- 未选中文字大小 -->
+        <attr name="tabUnSelectTextSize" format="integer|dimension" />
+        <!-- Tab 间的距离 -->
+        <attr name="tabPadding" format="integer|dimension" />
+        <!-- Tab 文字颜色 -->
+        <attr name="tabTextColor" format="color|dimension" />
+        <!-- Tab 底部线条颜色 -->
+        <attr name="tabLineColor" format="color|dimension" />
+    </declare-styleable>
 </resources>
