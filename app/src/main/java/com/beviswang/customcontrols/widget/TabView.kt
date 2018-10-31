@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import org.jetbrains.anko.doAsync
 import java.util.*
@@ -18,8 +19,8 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
     private var mTextPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var mLinePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    private var mDefHeight: Int = 20
-    private var mDefWidth: Int = 40
+    private var mDefHeight: Int = 0
+    private var mDefWidth: Int = 0
     private var mCurTextSize: Float = 0f
     private var mNormalTextSize: Float = 0f
     private var mSelectedTextSize: Float = 0f
@@ -82,10 +83,12 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
         mDefHeight += mLineBoxHeight
         if (mOffsetWidth == 0) {
             val defWidth = mTextPaint.measureText(mText).toInt() + paddingStart + paddingEnd
+            // TODO 抖动的关键在于文字的宽度不定，缩放导致被缩小的文字和被放大的文字有可能同时增加宽度（已测试证明）
+            Log.e("213","textWidth=${mTextPaint.measureText(mText).toInt()}")
             val offsetWidth = defWidth - mDefWidth
-            mDefWidth = defWidth
-            if (offsetWidth != 0)
+            if (mDefWidth != 0 && offsetWidth != 0)
                 mWidthChangedListener(offsetWidth)
+            mDefWidth = defWidth
         } else {
             mDefWidth += mOffsetWidth
             mOffsetWidth = 0
@@ -112,8 +115,9 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
         mWidthChangedListener = listener
     }
 
-    override fun setOffsetWidth(offsetWidth: Int) {
+    override fun setOffsetWidth(offsetWidth: Int, scale: Float) {
         mOffsetWidth = offsetWidth
+        setScrollScale(1f - scale)
     }
 
     override fun setText(text: String) {

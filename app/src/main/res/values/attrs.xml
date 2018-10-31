@@ -8,14 +8,16 @@
     <!-- 缩放 TabLayout 的自定义属性 -->
     <declare-styleable name="ZoomTabLayout">
         <!-- 选中文字大小 -->
-        <attr name="tabSelectTextSize" format="integer|dimension" />
+        <attr name="zoomTabSelectTextSize" format="integer|dimension" />
         <!-- 未选中文字大小 -->
-        <attr name="tabUnSelectTextSize" format="integer|dimension" />
+        <attr name="zoomTabUnSelectTextSize" format="integer|dimension" />
         <!-- Tab 间的距离 -->
-        <attr name="tabPadding" format="integer|dimension" />
+        <attr name="zoomTabPadding" format="integer|dimension" />
         <!-- Tab 文字颜色 -->
-        <attr name="tabTextColor" format="color|dimension" />
+        <attr name="zoomTabTextColor" format="color|dimension" />
         <!-- Tab 底部线条颜色 -->
-        <attr name="tabLineColor" format="color|dimension" />
+        <attr name="zoomTabLineColor" format="color|dimension" />
+        <!-- Tab 默认选中项 -->
+        <attr name="zoomTabDefaultSelected" format="integer" />
     </declare-styleable>
 </resources>

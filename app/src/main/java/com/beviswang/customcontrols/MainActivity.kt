@@ -4,6 +4,8 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.widget.RelativeLayout
+import com.beviswang.customcontrols.adapter.ZoomTabViewPagerAdapter
+import com.beviswang.customcontrols.fragment.AFragment
 import com.beviswang.customcontrols.util.KeyboardHeightProvider
 import com.beviswang.customcontrols.util.ViewHelper
 import kotlinx.android.synthetic.main.activity_main.*
@@ -25,6 +27,13 @@ class MainActivity : AppCompatActivity(), KeyboardHeightProvider.KeyboardHeightO
         zoomTabLayout.setTabTextSize(ViewHelper.sp2px(this@MainActivity,14f))
         zoomTabLayout.setItems(arrayOf("乐库", "推荐", "趴间", "看点"))
         zoomTabLayout.setItemPadding(ViewHelper.dip2px(this@MainActivity, 20f).toInt())
+
+        viewPager.adapter = ZoomTabViewPagerAdapter(arrayOf(
+                AFragment.newInstance("乐库","乐库"),
+                AFragment.newInstance("推荐","推荐"),
+                AFragment.newInstance("趴间","趴间"),
+                AFragment.newInstance("看点","看点")),supportFragmentManager)
+        zoomTabLayout.setupWithViewPager(viewPager)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

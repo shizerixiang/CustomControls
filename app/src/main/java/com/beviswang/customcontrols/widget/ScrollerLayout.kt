@@ -18,14 +18,6 @@ class ScrollerLayout @JvmOverloads constructor(context: Context, attrs: Attribut
     private var mLastX: Int = 0
     private var mLastY: Int = 0
 
-    init {
-
-    }
-
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event == null) {
@@ -35,7 +27,6 @@ class ScrollerLayout @JvmOverloads constructor(context: Context, attrs: Attribut
         val y = event.rawY.toInt()
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-
             }
             MotionEvent.ACTION_MOVE -> {
                 val deltaX = x - mLastX
@@ -44,24 +35,11 @@ class ScrollerLayout @JvmOverloads constructor(context: Context, attrs: Attribut
                 translationY += deltaY
             }
             MotionEvent.ACTION_UP -> {
-                val deltaX = 10
-                val deltaY = 10
-//                smoothScrollTo(deltaX * 20, deltaY * 20)
             }
         }
         mLastX = x
         mLastY = y
         return true
-    }
-
-    /**
-     * 缓慢滚动
-     */
-    private fun smoothScrollTo(destX: Int, destY: Int) {
-        val scrollX = scrollX
-        val deltaX = destX - scrollX
-        mScroller.startScroll(scrollX, 0, deltaX, 0, 1000)
-        invalidate()
     }
 
     override fun computeScroll() {
