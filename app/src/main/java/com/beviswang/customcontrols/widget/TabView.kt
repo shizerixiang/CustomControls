@@ -103,7 +103,6 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
             val minWidth = mNormalTextSize * textCount + paddingStart + paddingEnd
             val destWidth = maxWidth - minWidth
             val defWidth = Math.round(destWidth * mScrollScale + minWidth)
-            Log.e("213", "textSize=$mCurTextSize  textWidth=${mTextPaint.measureText(mText).toInt()} ——text=$mText")
             val offsetWidth = defWidth - mDefWidth
             if (mDefWidth != 0 && offsetWidth != 0)
                 mWidthChangedListener(offsetWidth)
