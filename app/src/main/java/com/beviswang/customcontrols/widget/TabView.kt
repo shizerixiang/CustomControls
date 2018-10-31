@@ -77,14 +77,33 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
 
     /** 计算适应内容的默认大小 */
     private fun computeDefSize() {
+//        mDefHeight = (mCurTextSize + mTextPaint.fontMetrics.descent).toInt() +
+//                paddingTop + paddingBottom
+//        // 加入线条区域高度
+//        mDefHeight += mLineBoxHeight
+//        if (mOffsetWidth == 0) {
+//            val defWidth = mTextPaint.measureText(mText).toInt() + paddingStart + paddingEnd
+//            // TODO 抖动的关键在于文字的宽度不定，缩放导致被缩小的文字和被放大的文字有可能同时增加宽度（已测试证明）
+//            Log.e("213","textSize=$mCurTextSize  textWidth=${mTextPaint.measureText(mText).toInt()}")
+//            val offsetWidth = defWidth - mDefWidth
+//            if (mDefWidth != 0 && offsetWidth != 0)
+//                mWidthChangedListener(offsetWidth)
+//            mDefWidth = defWidth
+//        } else {
+//            mDefWidth += mOffsetWidth
+//            mOffsetWidth = 0
+//        }
         mDefHeight = (mCurTextSize + mTextPaint.fontMetrics.descent).toInt() +
                 paddingTop + paddingBottom
         // 加入线条区域高度
         mDefHeight += mLineBoxHeight
         if (mOffsetWidth == 0) {
-            val defWidth = mTextPaint.measureText(mText).toInt() + paddingStart + paddingEnd
-            // TODO 抖动的关键在于文字的宽度不定，缩放导致被缩小的文字和被放大的文字有可能同时增加宽度（已测试证明）
-            Log.e("213","textWidth=${mTextPaint.measureText(mText).toInt()}")
+            val textCount = mText.length
+            val maxWidth = mSelectedTextSize * textCount + paddingStart + paddingEnd
+            val minWidth = mNormalTextSize * textCount + paddingStart + paddingEnd
+            val destWidth = maxWidth - minWidth
+            val defWidth = Math.round(destWidth * mScrollScale + minWidth)
+            Log.e("213", "textSize=$mCurTextSize  textWidth=${mTextPaint.measureText(mText).toInt()} ——text=$mText")
             val offsetWidth = defWidth - mDefWidth
             if (mDefWidth != 0 && offsetWidth != 0)
                 mWidthChangedListener(offsetWidth)
@@ -127,8 +146,8 @@ class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
 
     /** @param size 设置文字大小 */
     override fun setTextSize(size: Float): TabView {
-        mCurTextSize = size
         mNormalTextSize = size
+        mCurTextSize = mNormalTextSize
         mTextPaint.textSize = mCurTextSize
         resize()
         return this@TabView
