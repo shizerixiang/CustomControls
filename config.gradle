@@ -22,6 +22,7 @@ ext {
 
     dependencies = [
             // Google android support dependencies
+
             appcompat_v7      : "com.android.support:appcompat-v7:$android_support_version",
             support_v4        : "com.android.support:support-v4:$android_support_version",
             support_v13       : "com.android.support:support-v13:$android_support_version",

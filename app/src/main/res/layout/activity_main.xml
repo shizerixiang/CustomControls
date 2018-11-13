@@ -192,7 +192,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/headerBar3"
-            android:background="#ccc" />
+            android:background="#ee759aff"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp" />
 
     </com.beviswang.customcontrols.widget.ScrollerLayout>
 
