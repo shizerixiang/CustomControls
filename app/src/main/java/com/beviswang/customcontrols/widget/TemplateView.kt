@@ -12,6 +12,7 @@ import com.beviswang.customcontrols.R
 /**
  * 自定义绘制 View 模板
  * @author BevisWang
+ * @date 2018/11/14 16:13
  */
 class TemplateView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, def: Int = 0)
     : View(context, attrs, def) {

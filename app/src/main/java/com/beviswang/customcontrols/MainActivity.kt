@@ -9,8 +9,14 @@ import com.beviswang.customcontrols.fragment.AFragment
 import com.beviswang.customcontrols.util.KeyboardHeightProvider
 import com.beviswang.customcontrols.util.ViewHelper
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.*
+import org.jetbrains.anko.alignParentBottom
+import org.jetbrains.anko.centerHorizontally
 
+/**
+ * MainActivity
+ * @author BevisWang
+ * @date 2018/11/14 16:14
+ */
 class MainActivity : AppCompatActivity(), KeyboardHeightProvider.KeyboardHeightObserver {
     private var mKeyboardHeightProvider: KeyboardHeightProvider? = null
 
@@ -20,7 +26,7 @@ class MainActivity : AppCompatActivity(), KeyboardHeightProvider.KeyboardHeightO
 
         mKeyboardHeightProvider = KeyboardHeightProvider(this)
 
-        headerBar.onClick { _ ->
+        headerBar.setOnClickListener {
             waveView.startWave()
         }
 

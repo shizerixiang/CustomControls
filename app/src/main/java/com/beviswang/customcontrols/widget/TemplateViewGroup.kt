@@ -12,6 +12,7 @@ import android.widget.Scroller
 /**
  * 自定义可滑动 ViewGroup 模板
  * @author BevisWang
+ * @date 2018/11/14 16:13
  */
 class TemplateViewGroup @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, def: Int = 0)
     : ViewGroup(context, attrs, def) {

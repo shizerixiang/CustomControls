@@ -13,6 +13,7 @@ import android.view.animation.LinearInterpolator
 /**
  * 带有翻转动画的圆环
  * @author BevisWang
+ * @date 2018/11/14 16:11
  */
 class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, def: Int = 0)
     : View(context, attrs, def) {

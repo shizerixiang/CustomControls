@@ -11,6 +11,7 @@ import android.view.WindowManager
 /**
  * 自定义控件工具类
  * @author BevisWang
+ * @date 2018/11/14 16:16
  */
 object ViewHelper {
     /** 获取屏幕的宽 */

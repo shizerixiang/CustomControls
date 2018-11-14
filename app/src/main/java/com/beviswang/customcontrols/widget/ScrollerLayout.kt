@@ -10,6 +10,7 @@ import android.widget.Scroller
 /**
  * 跟手滑动控件
  * @author BevisWang
+ * @date 2018/11/14 16:12
  */
 class ScrollerLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, def: Int = 0)
     : RelativeLayout(context, attrs, def) {

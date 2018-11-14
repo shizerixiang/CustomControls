@@ -6,7 +6,8 @@ import android.view.MotionEvent
 
 /**
  * 增强版滑动手势
- * Created by shize on 2018/3/28.
+ * @author BevisWang
+ * @date 2018/11/14 16:12
  */
 class SlidingGestureDetector constructor(context: Context, private val listener: OnGestureListener)
     : GestureDetector.SimpleOnGestureListener() {

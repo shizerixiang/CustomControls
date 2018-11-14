@@ -12,6 +12,7 @@ import java.util.*
 /**
  * 用于 ZoomTabLayout 的 TabView
  * @author BevisWang
+ * @date 2018/11/14 16:13
  */
 class TabView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, def: Int = 0)
     : View(context, attrs, def), ZoomTabLayout.ITabView {

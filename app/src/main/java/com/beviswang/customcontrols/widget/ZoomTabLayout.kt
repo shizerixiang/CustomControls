@@ -14,6 +14,7 @@ import java.lang.ref.WeakReference
 /**
  * 自定义缩放 TabLayout
  * @author BevisWang
+ * @date 2018/11/14 16:14
  */
 class ZoomTabLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, def: Int = 0) :
         LinearLayout(context, attrs, def) {

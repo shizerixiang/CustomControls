@@ -14,6 +14,7 @@ import android.view.animation.LinearInterpolator
 /**
  * 水波纹
  * @author BevisWang
+ * @date 2018/11/14 16:13
  */
 class WaveView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, def: Int = 0)
     : View(context, attrs, def) {
