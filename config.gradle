@@ -4,8 +4,8 @@
  */
 ext {
     android_support_version = '27.1.1'
-    kotlin_version = '1.2.30'
-    anko_version = '0.9.1'
+    kotlin_version = '1.2.61'
+    anko_version = '0.10.8'
 
     android = [
             // About AAPT2 error:The compileSdkVersion if too low, AAPT2 will be error,We can close the AAPT2
