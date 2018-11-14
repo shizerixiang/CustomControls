@@ -6,12 +6,9 @@ import android.content.Context
 import android.graphics.*
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 
 /**
  * 带有翻转动画的圆环
@@ -25,6 +22,7 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     // 主圆环属性
     private var mArcPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var mArcWidth: Float = dip2px(context, 12f)
+    private var mArcBitmap: Bitmap? = null
     // 渐变色
     private lateinit var mGradientColors: IntArray
     private lateinit var mGradientPos: FloatArray
@@ -226,14 +224,6 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
         canvas?.drawText("中心", width / 2f + paddingStart, height / 2f + paddingTop, mTxtPaint)
 
-        // TODO 波纹效果
-        val mWavePaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mWavePaint.style = Paint.Style.STROKE
-        mWavePaint.strokeWidth = 1f
-        mWavePaint.color = Color.WHITE
-        mWavePaint.alpha = 100
-
-
         // 以下部分为旋转部分
         canvas?.save()
         canvas?.rotate(mCurAngle, width / 2f + paddingStart, height / 2f + paddingTop)
@@ -241,10 +231,43 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         val rectF = RectF(paddingStart.toFloat(), paddingTop.toFloat(),
                 diameter + paddingStart, diameter + paddingTop)
         rectF.offset(dx, dy)
-        // 转动效果
+
+        // 绘制需要转动的部分
+        if (mArcBitmap == null) mArcBitmap = getWaveBitmap(rectF)
+        canvas?.drawBitmap(mArcBitmap, 0f, 0f, mBitmapPaint)
+    }
+
+    private fun getWaveBitmap(rectF: RectF): Bitmap {
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint = Paint()
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = mArcWidth - 0.1f
+        canvas.drawArc(rectF, 0f, 360f, false, paint)
+
+        val bgBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bgCanvas = Canvas(bgBitmap)
+        val mWavePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mWavePaint.style = Paint.Style.STROKE
+        mWavePaint.strokeWidth = dip2px(context, 12f)
+        mWavePaint.color = Color.WHITE
+        mWavePaint.alpha = 40
+        rectF.offset(-dip2px(context, 4f), 0f)
+        bgCanvas.drawArc(rectF, 90f, 180f, false, mWavePaint)
+        rectF.offset(-dip2px(context, 4f), 0f)
+        bgCanvas.drawArc(rectF, 90f, 180f, false, mWavePaint)
+        rectF.offset(-dip2px(context, 4f), 0f)
+        bgCanvas.drawArc(rectF, 90f, 180f, false, mWavePaint)
+
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_OUT)
+        canvas.drawBitmap(bgBitmap, 0f, 0f, paint)
+        paint.xfermode = null
+        rectF.offset(dip2px(context, 12f), 0f)
+        // 转动炫光效果渲染器
         setShader()
         // 起始角度 + 绘制角度 大于 360 时，系统会从头开始绘制
-        canvas?.drawArc(rectF, 0f, 360f, false, mArcPaint)
+        canvas.drawArc(rectF, 0f, 360f, false, mArcPaint)
+        return bitmap
     }
 
     /** 保存为 bitmap，防止重新计算进度 */
@@ -284,6 +307,7 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         mProgressBitmap?.recycle()
+        mArcBitmap?.recycle()
     }
 
     /** dp 转 px */
