@@ -164,8 +164,8 @@
     </com.beviswang.customcontrols.widget.ScrollerLayout>
 
     <com.beviswang.customcontrols.widget.ScrollerLayout
-        android:layout_width="280dp"
-        android:layout_height="200dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:layout_marginStart="36dp"
         android:layout_marginTop="36dp"
         android:background="#fff"
@@ -192,10 +192,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/headerBar3"
-            android:background="#ee759aff"
+            android:background="#ee2266ff"
             android:clickable="true"
             android:focusable="true"
-            android:padding="8dp" />
+            android:padding="18dp" />
 
     </com.beviswang.customcontrols.widget.ScrollerLayout>
 

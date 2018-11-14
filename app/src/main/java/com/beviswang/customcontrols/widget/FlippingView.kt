@@ -6,9 +6,12 @@ import android.content.Context
 import android.graphics.*
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 /**
  * 带有翻转动画的圆环
@@ -21,7 +24,7 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     private val mDefHeight = 300
     // 主圆环属性
     private var mArcPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private var mArcWidth: Float = dip2px(context, 8f)
+    private var mArcWidth: Float = dip2px(context, 12f)
     // 渐变色
     private lateinit var mGradientColors: IntArray
     private lateinit var mGradientPos: FloatArray
@@ -36,7 +39,7 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     private var mCurProgress: Float = 0f
     // 文字
     private var mTxtPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private var mTxtSize: Float = sp2px(context, 16f)
+    private var mTxtSize: Float = sp2px(context, 32f)
     // 摄像头
     private val mCamera: Camera = Camera()
     private val mMatrix: Matrix = Matrix()
@@ -171,13 +174,13 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     /** 开启渐变动画 */
     fun startAnimation() {
-        val animation = ValueAnimator.ofFloat(0f, 1f)
+        val animation = ValueAnimator.ofInt(0, 100)
         animation.interpolator = LinearInterpolator()
-        animation.duration = 4000
+        animation.duration = 3000
         animation.repeatCount = -1
         animation.addUpdateListener {
-            val value = it.animatedValue as Float
-            mCurAngle = 360 * value
+            val value = it.animatedValue as Int
+            mCurAngle = value / 100f * 360
             postInvalidate()
         }
         animation.start()
@@ -214,14 +217,26 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         progressRectF.offset(dx + (mArcWidth * 1.5f), dy + (mArcWidth * 1.5f))
         // 内部进度环，采用一次绘制后，生成 bitmap，重复绘制时，直接复用，优化绘制速度
         if (mProgressBitmap == null) saveToBitmap(diameter, dx, dy)
-        canvas?.drawBitmap(mProgressBitmap, 0f, 0f, null)
+        val mBitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mBitmapPaint.alpha = mArcAlpha
+        canvas?.drawBitmap(mProgressBitmap, 0f, 0f, mBitmapPaint)
+
+        mProgressArcPaint.alpha = 255
         canvas?.drawArc(progressRectF, 270f, mCurProgress, false, mProgressArcPaint)
 
-        canvas?.drawText("中心", width / 2f + paddingStart, (height + paddingTop + mTxtSize) / 2f, mTxtPaint)
+        canvas?.drawText("中心", width / 2f + paddingStart, height / 2f + paddingTop, mTxtPaint)
+
+        // TODO 波纹效果
+        val mWavePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mWavePaint.style = Paint.Style.STROKE
+        mWavePaint.strokeWidth = 1f
+        mWavePaint.color = Color.WHITE
+        mWavePaint.alpha = 100
+
 
         // 以下部分为旋转部分
         canvas?.save()
-        canvas?.rotate(mCurAngle, getWidth() / 2f, getHeight() / 2f)
+        canvas?.rotate(mCurAngle, width / 2f + paddingStart, height / 2f + paddingTop)
 
         val rectF = RectF(paddingStart.toFloat(), paddingTop.toFloat(),
                 diameter + paddingStart, diameter + paddingTop)
@@ -230,8 +245,6 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         setShader()
         // 起始角度 + 绘制角度 大于 360 时，系统会从头开始绘制
         canvas?.drawArc(rectF, 0f, 360f, false, mArcPaint)
-
-        // TODO 波纹效果
     }
 
     /** 保存为 bitmap，防止重新计算进度 */
@@ -244,7 +257,7 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         (1..360).forEach {
             if (it % 2 == 0) {
                 mProgressArcPaint.color = mArcColor
-                mProgressArcPaint.alpha = mArcAlpha
+                mProgressArcPaint.alpha = 160
             } else mProgressArcPaint.color = Color.TRANSPARENT
             canvas.drawArc(progressRectF, it - 1f, 0.8f,
                     false, mProgressArcPaint)
