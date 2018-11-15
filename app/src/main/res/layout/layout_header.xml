@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ccc"
+    android:paddingEnd="8dp"
+    android:paddingStart="8dp"
+    android:paddingTop="6dp">
+
+    <ImageView
+        android:id="@+id/mWeatherImg"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_launcher_background" />
+
+    <TextView
+        android:id="@+id/mWeatherTem"
+        android:layout_width="24dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="28dp"
+        android:gravity="center_horizontal"
+        android:paddingEnd="0dp"
+        android:paddingStart="3dp"
+        android:text="14°"
+        android:textSize="12sp" />
+
+    <RelativeLayout
+        android:id="@+id/mSearchBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:id="@+id/mLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginStart="2dp"
+            android:gravity="center"
+            android:text="安庆 > "
+            android:textColor="#444"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/mSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="12dp"
+            android:layout_toEndOf="@id/mLocation"
+            android:layout_toStartOf="@+id/mAddImg"
+            android:background="@android:color/darker_gray"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_search"
+                android:tint="@android:color/white" />
+
+            <TextView
+                android:id="@+id/mHintTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="火锅"
+                android:textColor="#666" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/mAddImg"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="4dp"
+            android:src="@android:drawable/ic_input_add"
+            android:tint="@android:color/white" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

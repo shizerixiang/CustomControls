@@ -24,13 +24,16 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     private var mArcPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var mArcWidth: Float = dip2px(context, 12f)
     private var mArcBitmap: Bitmap? = null
+    private var mDiameter: Float = 0f // 主圆环直径
+    // 主圆环外切矩形数据及进度圆环外切矩形数据
+    private var mDx: Float = 0f
+    private var mDy: Float = 0f
+    private var mProgressRectF: RectF = RectF()
     // 渐变色
     private lateinit var mGradientColors: IntArray
     private lateinit var mGradientPos: FloatArray
     private lateinit var mShader: Shader
-    private var mCurAngle: Float = 0f // 当前的旋转角度
-    // 主圆环外部类波纹效果画笔
-    private var mWavePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var mCurAngle: Float = 0f // 当前的进度角度
     // 内部进度圆环属性
     private var mProgressArcPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var mProgressArcWidth: Float = dip2px(context, 2f)
@@ -48,8 +51,8 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     @ColorInt
     private var mArcColor: Int = Color.WHITE
     private var mArcAlpha: Int = MAX_ARC_ALPHA
-
-    private var mDegrees = 0f
+    // 翻转角度
+    private var mRotateDegrees = 0f
 
     init {
         initPaint()
@@ -67,10 +70,6 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         mShader = SweepGradient(mDefWidth / 2f, mDefHeight / 2f, mGradientColors, mGradientPos)
         mArcPaint.shader = mShader
 
-        mWavePaint.color = colorW
-        mWavePaint.style = Paint.Style.STROKE
-        mWavePaint.strokeWidth = mArcWidth / 2f
-
         mProgressArcPaint.color = mArcColor
         mProgressArcPaint.style = Paint.Style.STROKE
         mProgressArcPaint.strokeWidth = mProgressArcWidth
@@ -85,6 +84,27 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         super.onSizeChanged(w, h, oldw, oldh)
         mProgressBitmap?.recycle()
         mProgressBitmap = null
+        mArcBitmap?.recycle()
+        mArcBitmap = null
+        layoutArc()
+    }
+
+    /** 计算圆环尺寸数据 */
+    private fun layoutArc() {
+        val height = height - paddingTop - paddingBottom
+        val width = width - paddingStart - paddingEnd
+        mDx = mArcWidth / 2f
+        mDy = mArcWidth / 2f
+        if (width < height) {
+            mDiameter = width - mArcWidth
+            mDy += (height - width) / 2f
+        } else {
+            mDiameter = height - mArcWidth
+            mDx += (width - height) / 2f
+        }
+        mProgressRectF = RectF(paddingStart.toFloat(), paddingTop.toFloat(),
+                mDiameter + paddingStart - (mArcWidth * 3), mDiameter + paddingTop - (mArcWidth * 3))
+        mProgressRectF.offset(mDx + (mArcWidth * 1.5f), mDy + (mArcWidth * 1.5f))
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -135,8 +155,8 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
      */
     fun rotateDegrees(degrees: Float) {
         if (degrees < 0 || degrees > 180)
-            throw IndexOutOfBoundsException("角度值越界！范围 0-180，当前 $mDegrees ！")
-        mDegrees = 90 - Math.abs(90 - degrees)
+            throw IndexOutOfBoundsException("角度值越界！范围 0-180，当前 $mRotateDegrees ！")
+        mRotateDegrees = 90 - Math.abs(90 - degrees)
         postInvalidate()
     }
 
@@ -147,7 +167,7 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     fun rotateScale(scale: Float) {
         if (scale < 0 || scale > 1)
             throw IndexOutOfBoundsException("角度值比例越界！范围 0-1，当前 $scale ！")
-        mDegrees = scale * 90
+        mRotateDegrees = scale * 90
         mArcAlpha = ((1 - scale) * MAX_ARC_ALPHA).toInt()
         mArcPaint.alpha = mArcAlpha
         mProgressArcPaint.alpha = mArcAlpha
@@ -190,55 +210,31 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         super.onDraw(canvas)
         val height = height - paddingTop - paddingBottom
         val width = width - paddingStart - paddingEnd
-        var dx = mArcWidth / 2f
-        var dy = mArcWidth / 2f
-        val diameter: Float
-        if (width < height) {
-            diameter = width - mArcWidth
-            dy += (height - width) / 2f
-        } else {
-            diameter = height - mArcWidth
-            dx += (width - height) / 2f
-        }
-
-//        val matrix = Matrix()
-        // px,py 为旋转中心点坐标；degrees 为旋转度数 (模拟摄像头，但存在无法控制 z 轴的问题)
-//        matrix.postRotate(45f, width / 2f, height / 2f)
-//        matrix.postSkew(0.5f, 0.5f, width / 2f, height / 2f)
-//        matrix.postRotate(45f, width / 2f, height / 2f)
-//        matrix.postScale(0.7f, 0.7f, width / 2f, height / 2f)
-//        canvas?.concat(matrix)
+        // 安装镜头
         setupCamera()
         canvas?.concat(mMatrix)
-
-        val progressRectF = RectF(paddingStart.toFloat(), paddingTop.toFloat(),
-                diameter + paddingStart - (mArcWidth * 3), diameter + paddingTop - (mArcWidth * 3))
-        progressRectF.offset(dx + (mArcWidth * 1.5f), dy + (mArcWidth * 1.5f))
         // 内部进度环，采用一次绘制后，生成 bitmap，重复绘制时，直接复用，优化绘制速度
-        if (mProgressBitmap == null) saveToBitmap(diameter, dx, dy)
+        if (mProgressBitmap == null) mProgressBitmap = getProgressBitmap()
         val mBitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         mBitmapPaint.alpha = mArcAlpha
         canvas?.drawBitmap(mProgressBitmap, 0f, 0f, mBitmapPaint)
-
-        mProgressArcPaint.alpha = 255
-        canvas?.drawArc(progressRectF, 270f, mCurProgress, false, mProgressArcPaint)
+        drawCurProgress(canvas)
 
         canvas?.drawText("中心", width / 2f + paddingStart, height / 2f + paddingTop, mTxtPaint)
-
         // 以下部分为旋转部分
         canvas?.save()
         canvas?.rotate(mCurAngle, width / 2f + paddingStart, height / 2f + paddingTop)
-
-        val rectF = RectF(paddingStart.toFloat(), paddingTop.toFloat(),
-                diameter + paddingStart, diameter + paddingTop)
-        rectF.offset(dx, dy)
-
         // 绘制需要转动的部分
-        if (mArcBitmap == null) mArcBitmap = getWaveBitmap(rectF)
+        if (mArcBitmap == null) mArcBitmap = getWaveBitmap()
         canvas?.drawBitmap(mArcBitmap, 0f, 0f, mBitmapPaint)
     }
 
-    private fun getWaveBitmap(rectF: RectF): Bitmap {
+    /** 获取所有需要旋转的图形 bitmap，并储存，优化绘制 */
+    private fun getWaveBitmap(): Bitmap {
+        val rectF = RectF(paddingStart.toFloat(), paddingTop.toFloat(),
+                mDiameter + paddingStart, mDiameter + paddingTop)
+        rectF.offset(mDx, mDy)
+
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         val paint = Paint()
@@ -248,22 +244,22 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
         val bgBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val bgCanvas = Canvas(bgBitmap)
-        val mWavePaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mWavePaint.style = Paint.Style.STROKE
-        mWavePaint.strokeWidth = dip2px(context, 12f)
-        mWavePaint.color = Color.WHITE
-        mWavePaint.alpha = 40
+        val wavePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        wavePaint.style = Paint.Style.STROKE
+        wavePaint.strokeWidth = dip2px(context, 12f)
+        wavePaint.color = Color.WHITE
+        wavePaint.alpha = 40
         rectF.offset(-dip2px(context, 4f), 0f)
-        bgCanvas.drawArc(rectF, 90f, 180f, false, mWavePaint)
+        bgCanvas.drawArc(rectF, 90f, 180f, false, wavePaint)
         rectF.offset(-dip2px(context, 4f), 0f)
-        bgCanvas.drawArc(rectF, 90f, 180f, false, mWavePaint)
+        bgCanvas.drawArc(rectF, 90f, 180f, false, wavePaint)
         rectF.offset(-dip2px(context, 4f), 0f)
-        bgCanvas.drawArc(rectF, 90f, 180f, false, mWavePaint)
+        bgCanvas.drawArc(rectF, 90f, 180f, false, wavePaint)
 
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_OUT)
         canvas.drawBitmap(bgBitmap, 0f, 0f, paint)
         paint.xfermode = null
-        rectF.offset(dip2px(context, 12f), 0f)
+        rectF.offset(dip2px(context, 12f) + 1, 0f)
         // 转动炫光效果渲染器
         setShader()
         // 起始角度 + 绘制角度 大于 360 时，系统会从头开始绘制
@@ -271,21 +267,38 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         return bitmap
     }
 
-    /** 保存为 bitmap，防止重新计算进度 */
-    private fun saveToBitmap(diameter: Float, dx: Float, dy: Float) {
-        mProgressBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(mProgressBitmap)
-        val progressRectF = RectF(paddingStart.toFloat(), paddingTop.toFloat(),
-                diameter + paddingStart - (mArcWidth * 3), diameter + paddingTop - (mArcWidth * 3))
-        progressRectF.offset(dx + (mArcWidth * 1.5f), dy + (mArcWidth * 1.5f))
+    /** 获取进度刻度 bitmap，并储存，防止重新计算进度 */
+    private fun getProgressBitmap(): Bitmap {
+        val progressBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(progressBitmap)
         (1..360).forEach {
             if (it % 2 == 0) {
                 mProgressArcPaint.color = mArcColor
                 mProgressArcPaint.alpha = 160
             } else mProgressArcPaint.color = Color.TRANSPARENT
-            canvas.drawArc(progressRectF, it - 1f, 0.8f,
+            canvas.drawArc(mProgressRectF, it - 1f, 0.8f,
                     false, mProgressArcPaint)
         }
+        return progressBitmap
+    }
+
+    /**
+     * 绘制当前进度及进度点
+     * 原点坐标：(x0,y0)
+     * 半径：r
+     * 角度：ao
+     *
+     * 则圆上任一点为：（x1,y1）
+     * x1   =   x0   +   r   *   cos(ao   *   3.14   /180   )
+     * y1   =   y0   +   r   *   sin(ao   *   3.14   /180   )
+     * @param canvas 画板
+     */
+    private fun drawCurProgress(canvas: Canvas?) {
+        // 绘制进度
+        mProgressArcPaint.alpha = 255
+        canvas?.drawArc(mProgressRectF, 270f, mCurProgress, false, mProgressArcPaint)
+        // 绘制进度指针圆点
+
     }
 
     /** 设置渲染器 */
@@ -298,7 +311,7 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     private fun setupCamera() {
         mCamera.save()
         // 翻转角度
-        mCamera.rotateX(mDegrees)
+        mCamera.rotateX(mRotateDegrees)
         mCamera.getMatrix(mMatrix)
         mCamera.restore()
         mMatrix.preTranslate(-(width / 2f + paddingStart), -(height / 2f + paddingTop))
