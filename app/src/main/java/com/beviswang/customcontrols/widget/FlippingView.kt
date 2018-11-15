@@ -25,6 +25,8 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     private var mArcWidth: Float = dip2px(context, 12f)
     private var mArcBitmap: Bitmap? = null
     private var mDiameter: Float = 0f // 主圆环直径
+    private var mCenterX: Float = 0f
+    private var mCenterY: Float = 0f
     // 主圆环外切矩形数据及进度圆环外切矩形数据
     private var mDx: Float = 0f
     private var mDy: Float = 0f
@@ -39,6 +41,8 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     private var mProgressArcWidth: Float = dip2px(context, 2f)
     private var mProgressBitmap: Bitmap? = null
     private var mCurProgress: Float = 0f
+    // 进度圆环的圆点
+    private val mPointPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     // 文字
     private var mTxtPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var mTxtSize: Float = sp2px(context, 32f)
@@ -75,6 +79,9 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         mProgressArcPaint.strokeWidth = mProgressArcWidth
         mProgressArcPaint.alpha = mArcAlpha
 
+        mPointPaint.style = Paint.Style.FILL_AND_STROKE
+        mPointPaint.color = mArcColor
+
         mTxtPaint.color = Color.WHITE
         mTxtPaint.textSize = mTxtSize
         mTxtPaint.textAlign = Paint.Align.CENTER
@@ -105,6 +112,8 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         mProgressRectF = RectF(paddingStart.toFloat(), paddingTop.toFloat(),
                 mDiameter + paddingStart - (mArcWidth * 3), mDiameter + paddingTop - (mArcWidth * 3))
         mProgressRectF.offset(mDx + (mArcWidth * 1.5f), mDy + (mArcWidth * 1.5f))
+        mCenterX = width / 2f + paddingStart
+        mCenterY = height / 2f + paddingTop
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -208,8 +217,6 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        val height = height - paddingTop - paddingBottom
-        val width = width - paddingStart - paddingEnd
         // 安装镜头
         setupCamera()
         canvas?.concat(mMatrix)
@@ -220,10 +227,10 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         canvas?.drawBitmap(mProgressBitmap, 0f, 0f, mBitmapPaint)
         drawCurProgress(canvas)
 
-        canvas?.drawText("中心", width / 2f + paddingStart, height / 2f + paddingTop, mTxtPaint)
+        canvas?.drawText("中心", mCenterX, mCenterY, mTxtPaint)
         // 以下部分为旋转部分
         canvas?.save()
-        canvas?.rotate(mCurAngle, width / 2f + paddingStart, height / 2f + paddingTop)
+        canvas?.rotate(mCurAngle, mCenterX, mCenterY)
         // 绘制需要转动的部分
         if (mArcBitmap == null) mArcBitmap = getWaveBitmap()
         canvas?.drawBitmap(mArcBitmap, 0f, 0f, mBitmapPaint)
@@ -289,8 +296,8 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * 角度：ao
      *
      * 则圆上任一点为：（x1,y1）
-     * x1   =   x0   +   r   *   cos(ao   *   3.14   /180   )
-     * y1   =   y0   +   r   *   sin(ao   *   3.14   /180   )
+     * x1   =   x0   +   r   *   cos(ao   *   3.14   /180 )
+     * y1   =   y0   +   r   *   sin(ao   *   3.14   /180 )
      * @param canvas 画板
      */
     private fun drawCurProgress(canvas: Canvas?) {
@@ -298,7 +305,14 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         mProgressArcPaint.alpha = 255
         canvas?.drawArc(mProgressRectF, 270f, mCurProgress, false, mProgressArcPaint)
         // 绘制进度指针圆点
-
+        val r = mProgressRectF.width() / 2f
+        var ao = mCurProgress - 90
+        if (ao < 0) ao += 360
+        val pointX = mCenterX + (r * Math.cos(ao * Math.PI / 180)).toFloat()
+        val pointY = mCenterY + (r * Math.sin(ao * Math.PI / 180)).toFloat()
+        val pointR = dip2px(context, 4f)
+        val mPointRect = RectF(pointX - pointR, pointY - pointR, pointX + pointR, pointY + pointR)
+        canvas?.drawArc(mPointRect, 0f, 360f, false, mPointPaint)
     }
 
     /** 设置渲染器 */
