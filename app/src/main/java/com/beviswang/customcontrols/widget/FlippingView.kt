@@ -11,7 +11,7 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 
 /**
- * 带有翻转动画的圆环
+ * 带有翻转动画的圆环（仿小米运动）
  * @author BevisWang
  * @date 2018/11/14 16:11
  */

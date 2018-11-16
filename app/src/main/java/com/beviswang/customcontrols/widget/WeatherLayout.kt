@@ -8,7 +8,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.beviswang.customcontrols.R
 /**
- * 头部天气布局控件
+ * 头部天气布局控件 （仿美团头部天气）
  * @author BevisWang
  * @date 2018/11/15 9:24
  */

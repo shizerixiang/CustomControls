@@ -10,7 +10,7 @@ import org.jetbrains.anko.doAsync
 import java.util.*
 
 /**
- * 用于 ZoomTabLayout 的 TabView
+ * 用于 ZoomTabLayout 的 TabView （仿虾米音乐 Tab）
  * @author BevisWang
  * @date 2018/11/14 16:13
  */

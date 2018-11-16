@@ -12,7 +12,7 @@ import org.jetbrains.anko.uiThread
 import java.lang.ref.WeakReference
 
 /**
- * 自定义缩放 TabLayout
+ * 自定义缩放 TabLayout （仿虾米音乐 TabBar）
  * @author BevisWang
  * @date 2018/11/14 16:14
  */

@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ViewActivity"
+            android:name=".MainActivity"
             android:theme="@style/AppTheme.FullScreen"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
@@ -21,9 +21,12 @@
         </activity>
         <activity
             android:name=".TestActivity"
-            android:theme="@style/AppTheme.NoTitle"></activity>
-        <activity android:name=".Main2Activity"></activity>
-        <activity android:name=".MainActivity"></activity>
+            android:theme="@style/AppTheme.NoTitle">
+
+        </activity>
+        <activity android:name=".Main2Activity">
+
+        </activity>
     </application>
 
 </manifest>
