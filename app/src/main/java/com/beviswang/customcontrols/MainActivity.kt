@@ -32,6 +32,15 @@ class MainActivity : AppCompatActivity() {
                 AFragment.newInstance("趴间", "趴间"),
                 AFragment.newInstance("看点", "看点")), supportFragmentManager)
         zoomTabLayout.setupWithViewPager(viewPager)
+
+        val carMap = HashMap<String, Float>()
+        carMap["捷达"] = 0.4f
+        carMap["布加迪"] = 0.08f
+        carMap["丰田"] = 0.07f
+        carMap["奥迪"] = 0.05f
+        carMap["宝马"] = 0.3f
+        carMap["奔驰"] = 0.1f
+        mPieChart.setData(carMap)
     }
 
     override fun onResume() {
