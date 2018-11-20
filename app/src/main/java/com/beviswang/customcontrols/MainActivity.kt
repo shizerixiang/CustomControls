@@ -33,12 +33,16 @@ class MainActivity : AppCompatActivity() {
         zoomTabLayout.setupWithViewPager(viewPager)
 
         val carMap = HashMap<String, Float>()
-        carMap["捷达"] = 0.4f
-        carMap["布加迪"] = 0.08f
-        carMap["丰田"] = 0.07f
-        carMap["奥迪"] = 0.05f
-        carMap["宝马"] = 0.3f
-        carMap["奔驰"] = 0.1f
+        carMap["捷达"] = 0.12f
+        carMap["标志"] = 0.13f
+        carMap["雪铁龙"] = 0.1f
+        carMap["保时捷"] = 0.05f
+        carMap["布加迪"] = 0.0549f
+        carMap["丰田"] = 0.0451f
+        carMap["奥迪"] = 0.15f
+        carMap["宝马"] = 0.05f
+        carMap["大众"] = 0.14f
+        carMap["奔驰"] = 0.16f
         mPieChart.setData(carMap)
     }
 
