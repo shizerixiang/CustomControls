@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
         zoomTabLayout.setTabTextSize(ViewHelper.sp2px(this@MainActivity, 14f))
         zoomTabLayout.setItems(arrayOf("乐库", "推荐", "趴间", "看点"))
         zoomTabLayout.setItemPadding(ViewHelper.dip2px(this@MainActivity, 20f).toInt())
-
         viewPager.adapter = ZoomTabViewPagerAdapter(arrayOf(
                 AFragment.newInstance("乐库", "乐库"),
                 AFragment.newInstance("推荐", "推荐"),

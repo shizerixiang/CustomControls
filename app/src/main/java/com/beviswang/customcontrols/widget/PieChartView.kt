@@ -3,9 +3,13 @@ package com.beviswang.customcontrols.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
+import android.support.annotation.ColorInt
 import android.util.AttributeSet
+import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
@@ -35,9 +39,17 @@ class PieChartView @JvmOverloads constructor(context: Context, attrs: AttributeS
     private var rightX: Float = 0f
     // 实录数据（key 为标记，value 为比例）
     private lateinit var mDataMap: HashMap<String, Float>
+    private var mColors: HashMap<String, Int> = HashMap()
     // 中心圆数据，用于产生扇形图间的间隙
     private var mCenterX: Float = 0f
     private var mCenterY: Float = 0f
+    // 记录手指的位置
+    private var mLastX: Float = 0f
+    private var mLastY: Float = 0f
+    // 旋转角度
+    private var mRotateAngle: Float = 0f
+    // 扇形的起始位置
+    private var mStartAngle: Float = 0f
 
     init {
         mArcPaint.style = Paint.Style.FILL_AND_STROKE
@@ -98,6 +110,55 @@ class PieChartView @JvmOverloads constructor(context: Context, attrs: AttributeS
         }
     }
 
+    /**
+     * 两点间的距离公式：
+     * ab = Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
+     * 两点直线与 x 轴的夹角
+     * var p1:Point = new Point(40,30);
+     * var p2:Point = new Point(80,60);
+     *
+     * var angle:Number = Math.atan2((p2.y-p1.y), (p2.x-p1.x)) // 弧度
+     * var theta:Number = angle*(180/Math.PI); // 角度
+     */
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event == null) return super.onTouchEvent(event)
+        val x = event.x
+        val y = event.y
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                val dx = x - mCenterX
+                val dy = y - mCenterY
+                val ab = Math.sqrt((dx * dx + dy * dy).toDouble())
+                if (ab > mArcDiameter / 2) return super.onTouchEvent(event) // 不在圆上
+            }
+            MotionEvent.ACTION_MOVE -> {
+                if (x == mLastX && y == mLastY) return true // 手指停止移动
+                // 上次点与 x 轴的夹角
+                val arc1 = Math.atan2(((mCenterY - mLastY).toDouble()), (mCenterX - mLastX).toDouble())
+                val angle1 = (arc1 * (180 / Math.PI)).toFloat()
+                // 当前点与 x 轴的夹角
+                val arc2 = Math.atan2(((mCenterY - y).toDouble()), (mCenterX - x).toDouble())
+                val angle2 = (arc2 * (180 / Math.PI)).toFloat()
+
+                mRotateAngle = angle2 - angle1
+                mStartAngle += mRotateAngle
+                if (mStartAngle < 0) mStartAngle += 360
+                if (mStartAngle > 360) mStartAngle -= 360
+
+//                Log.e(javaClass.simpleName, "angle1=$angle1  angle2=$angle2  rotateAngle=$mRotateAngle")
+            }
+            MotionEvent.ACTION_UP -> {
+            }
+            MotionEvent.ACTION_CANCEL -> {
+            }
+        }
+        postInvalidate()
+        mLastX = x
+        mLastY = y
+        return true
+    }
+
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
@@ -117,19 +178,18 @@ class PieChartView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * 注意：HashMap.value 总和必须为 1f
      */
     private fun drawArc(canvas: Canvas?) {
-        var startAngle = 0f
+        var startAngle = mStartAngle
+        val isRandomColor: Boolean = mColors.isEmpty()
         mDataMap.map {
             val d = it.value * 360
             // 绘制扇形
-            val r = Random().nextInt(255)
-            val g = Random().nextInt(255)
-            val b = Random().nextInt(255)
-            val color = Color.rgb(r, g, b)
-            mArcPaint.color = color
+            if (isRandomColor) mColors[it.key] = getRandomColor()
+            mArcPaint.color = mColors[it.key] ?: getRandomColor()
             canvas?.drawArc(mArcRectF, startAngle, d, true, mArcPaint)
             // 绘制提示文字
             val rad = mArcDiameter / 2f
-            val ao = startAngle + (d / 2f)
+            var ao = startAngle + (d / 2f)
+            if (ao > 360) ao -= 360
             var x = mCenterX + (rad * Math.cos(ao * Math.PI / 180)).toFloat()
             var y = mCenterY + (rad * Math.sin(ao * Math.PI / 180)).toFloat()
             val path = Path()
@@ -171,8 +231,18 @@ class PieChartView @JvmOverloads constructor(context: Context, attrs: AttributeS
             canvas?.drawText(it.key, x, y + (mTextPaint.textSize / 2f), mTextPaint)
             canvas?.drawPath(path, mLinePaint)
             startAngle += d
+            if (startAngle > 360) startAngle -= 360
             it
         }
+    }
+
+    /** 获取随机颜色 */
+    @ColorInt
+    fun getRandomColor(): Int {
+        val r = Random().nextInt(255)
+        val g = Random().nextInt(255)
+        val b = Random().nextInt(255)
+        return Color.rgb(r, g, b)
     }
 
     /** dp 转 px */
