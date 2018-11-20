@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
                 AFragment.newInstance("趴间", "趴间"),
                 AFragment.newInstance("看点", "看点")), supportFragmentManager)
         zoomTabLayout.setupWithViewPager(viewPager)
-
+        // TODO 转动卡顿时，请把放小米运动首页的动画关掉，谢谢！！！
         val carMap = HashMap<String, Float>()
         carMap["捷达"] = 0.12f
         carMap["标志"] = 0.13f
