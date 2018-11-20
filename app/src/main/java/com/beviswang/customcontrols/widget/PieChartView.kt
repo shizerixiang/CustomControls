@@ -5,11 +5,9 @@ import android.content.Context
 import android.graphics.*
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
