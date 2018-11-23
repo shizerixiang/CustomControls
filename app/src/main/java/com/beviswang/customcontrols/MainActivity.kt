@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
                 AFragment.newInstance("趴间", "趴间"),
                 AFragment.newInstance("看点", "看点")), supportFragmentManager)
         zoomTabLayout.setupWithViewPager(viewPager)
-        // TODO 转动卡顿时，请把放小米运动首页的动画关掉，谢谢！！！
+        // TODO 转动卡顿时，请把仿小米运动首页的动画关掉，谢谢！！！
         val carMap = HashMap<String, Float>()
         carMap["捷达"] = 0.12f
         carMap["标志"] = 0.13f
@@ -48,7 +48,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        flipping.startAnimation()
+        flipping.startLoadedAnimation()
+        mFlipBoardView.startAnimator()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        flipping.pauseLoadedAnimation()
+        mFlipBoardView.pauseAnimator()
     }
 
     override fun onDestroy() {

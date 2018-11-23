@@ -57,6 +57,8 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     private var mArcAlpha: Int = MAX_ARC_ALPHA
     // 翻转角度
     private var mRotateDegrees = 0f
+    // 动画
+    private var mLoadedAnimator: ValueAnimator? = null // 加载完成的动画
 
     init {
         initPaint()
@@ -201,22 +203,44 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
     }
 
     /** 开启渐变动画 */
-    fun startAnimation() {
-        val animation = ValueAnimator.ofInt(0, 100)
-        animation.interpolator = LinearInterpolator()
-        animation.duration = 3000
-        animation.repeatCount = -1
-        animation.addUpdateListener {
-            val value = it.animatedValue as Int
-            mCurAngle = value / 100f * 360
-            postInvalidate()
+    fun startLoadedAnimation() {
+        if (mLoadedAnimator == null) {
+            mLoadedAnimator = ValueAnimator.ofInt(0, 100)
+            mLoadedAnimator?.interpolator = LinearInterpolator()
+            mLoadedAnimator?.duration = 3000
+            mLoadedAnimator?.repeatCount = -1
+            mLoadedAnimator?.addUpdateListener {
+                val value = it.animatedValue as Int
+                mCurAngle = value / 100f * 360
+                postInvalidate()
+            }
         }
-        animation.start()
+        // 检查是否动画正在运行
+        if (mLoadedAnimator?.isRunning == true) mLoadedAnimator?.cancel()
+        mLoadedAnimator?.start()
+    }
+
+    /** 暂停渐变动画 */
+    fun pauseLoadedAnimation() {
+        if (mLoadedAnimator == null) return
+        if (mLoadedAnimator?.isRunning == true) mLoadedAnimator?.pause()
+    }
+
+    /** 关闭渐变动画 */
+    fun stopLoadedAnimation() {
+        if (mLoadedAnimator == null) return
+        if (mLoadedAnimator?.isRunning == true) mLoadedAnimator?.cancel()
+        mLoadedAnimator = null
     }
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
+        drawLoaded(canvas)
+    }
+
+    /** 绘制加载完成的 View */
+    private fun drawLoaded(canvas: Canvas?) {
         // 安装镜头
         setupCamera()
         canvas?.concat(mMatrix)
@@ -236,7 +260,7 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         canvas?.drawBitmap(mArcBitmap, 0f, 0f, mBitmapPaint)
     }
 
-    /** 获取所有需要旋转的图形 bitmap，并储存，优化绘制 */
+    /** 获取所有需要旋转的图形 bitmap，并储存，优化绘制（离屏缓冲） */
     private fun getWaveBitmap(): Bitmap {
         val rectF = RectF(paddingStart.toFloat(), paddingTop.toFloat(),
                 mDiameter + paddingStart, mDiameter + paddingTop)
@@ -255,7 +279,7 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         wavePaint.style = Paint.Style.STROKE
         wavePaint.strokeWidth = dip2px(context, 12f)
         wavePaint.color = Color.WHITE
-        wavePaint.alpha = 40
+        wavePaint.alpha = 30
         rectF.offset(-dip2px(context, 4f), 0f)
         bgCanvas.drawArc(rectF, 90f, 180f, false, wavePaint)
         rectF.offset(-dip2px(context, 4f), 0f)
@@ -334,6 +358,7 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        stopLoadedAnimation()
         mProgressBitmap?.recycle()
         mArcBitmap?.recycle()
     }
