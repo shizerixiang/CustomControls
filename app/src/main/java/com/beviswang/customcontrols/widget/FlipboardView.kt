@@ -6,8 +6,10 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import com.beviswang.customcontrols.R
 import com.beviswang.customcontrols.graphics.Point3DF
+import com.beviswang.customcontrols.graphics.PointHelper
 import com.beviswang.customcontrols.util.BitmapHelper
 
 /**
@@ -29,6 +31,32 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
     // 动画属性
     private var mValueAnimator: ValueAnimator? = null           // 动画类
     private var mCurValue: Float = 0f                           // 当前动画进度 0f-1f
+    // 上次的动画进度，记录 mCurValue
+    private var mLastValue = 0f
+    // 镜头最大翻转角度
+    private val maxAngel = 30
+
+    /**
+     * 旋转矩形的四个点坐标
+     *  B --------- C
+     *    |       |
+     *    |       |
+     *  A --------- D
+     */
+    private var pA = PointF(0f, 0f)
+    private var pB = PointF(0f, 0f)
+    private var pC = PointF(0f, 0f)
+    private var pD = PointF(0f, 0f)
+    // 四个点的旋转路径圆的半径
+    private var radiusA: Float = 0f
+    private var radiusB: Float = 0f
+    private var radiusC: Float = 0f
+    private var radiusD: Float = 0f
+    // 四个点的旋转角度（初始角度不同）
+    private var angelA = 90f
+    private var angelB = 270f
+    private var angelC = 315f
+    private var angelD = 45f
 
     init {
         mPicBitmap = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_flipboard_logo)
@@ -74,18 +102,114 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
 
         mCenterX = width / 2f
         mCenterY = height / 2f
+
+        // 四个点的旋转路径圆的半径
+        val picWidth = mPicBitmap!!.width
+        val picHeight = mPicBitmap!!.height
+        radiusA = Math.sqrt(Math.pow(picHeight.toDouble(), 2.0) + Math.pow(picWidth.toDouble(), 2.0)).toFloat() / 2f
+        radiusC = Math.sqrt(Math.pow(radiusA.toDouble(), 2.0) * 2).toFloat()
+        radiusB = radiusA
+        radiusD = radiusC
     }
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-//        val rectFTop = RectF(0f, 0f, width.toFloat(), height / 2f)
-//        drawRotateBitmap(canvas, rectFTop, Point3DF(x = 30f * mCurValue))
-//
-//        val rectFBottom = RectF(0f, height / 2f, width.toFloat(), height.toFloat())
-//        drawRotateBitmap(canvas, rectFBottom, Point3DF(x = 30f * mCurValue))
 
+        calculateAngel()
+        calculatePoints()
+        val curPath = Path()
+        curPath.moveTo(pA.x, pA.y)
+        curPath.lineTo(pB.x, pB.y)
+        curPath.lineTo(pC.x, pC.y)
+        curPath.lineTo(pD.x, pD.y)
+        curPath.close()
 
+        val point3DF = getPoint3DF()
+        drawRotateBitmap(canvas, curPath, point3DF)
+        drawClipBitmap(canvas, curPath)
+    }
+
+    /** 获取三轴旋转角度 */
+    private fun getPoint3DF(): Point3DF {
+        val point3DF = Point3DF()
+        when {
+            mCurValue < 90 -> {
+                point3DF.x = mCurValue % 90 / 90f * -maxAngel
+                point3DF.y = mCurValue % 90 / 90f * maxAngel - maxAngel
+            }
+            mCurValue < 180 -> {
+                point3DF.x = mCurValue % 90 / 90f * maxAngel - maxAngel
+                point3DF.y = mCurValue % 90 / 90f * maxAngel
+            }
+            mCurValue < 270 -> {
+                point3DF.x = mCurValue % 90 / 90f * maxAngel
+                point3DF.y = maxAngel - mCurValue % 90 / 90f * maxAngel
+            }
+            mCurValue < 360 -> {
+                point3DF.x = maxAngel - mCurValue % 90 / 90f * maxAngel
+                point3DF.y = mCurValue % 90 / 90f * -maxAngel
+            }
+        }
+        return point3DF
+    }
+
+    /**
+     * 绘制路径外的图案
+     * @param canvas 画板
+     * @param path 路径
+     */
+    private fun drawClipBitmap(canvas: Canvas?, path: Path) {
+        val picWidth = mPicBitmap!!.width
+        val picHeight = mPicBitmap!!.height
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.style = Paint.Style.FILL_AND_STROKE
+        paint.color = Color.BLUE
+
+        val destBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val destCanvas = Canvas(destBitmap)
+        destCanvas.drawPath(path, paint)
+        destCanvas.save()
+
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val srcCanvas = Canvas(bitmap)
+
+        val saved = srcCanvas.saveLayer(null, null, Canvas.ALL_SAVE_FLAG)
+        srcCanvas.drawBitmap(mPicBitmap, (width - picWidth) / 2f, (height - picHeight) / 2f, paint)
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_OUT)
+        srcCanvas.drawBitmap(destBitmap, 0f, 0f, paint)
+        paint.xfermode = null
+        srcCanvas.restoreToCount(saved)
+
+        canvas?.drawBitmap(bitmap, 0f, 0f, mBitmapPaint)
+    }
+
+    /** 计算当前四个点的角度 */
+    private fun calculateAngel() {
+        val changedValue = mCurValue - mLastValue
+        angelA -= changedValue
+        if (angelA < 0) angelA += 360
+        if (angelA > 360) angelA -= 360
+        angelB -= changedValue
+        if (angelB < 0) angelB += 360
+        if (angelB > 360) angelB -= 360
+        angelC -= changedValue
+        if (angelC < 0) angelC += 360
+        if (angelC > 360) angelC -= 360
+        angelD -= changedValue
+        if (angelD < 0) angelD += 360
+        if (angelD > 360) angelD -= 360
+        mLastValue = mCurValue
+    }
+
+    /**
+     * 计算旋转矩形的四个顶点
+     */
+    private fun calculatePoints() {
+        pA = PointHelper.getPointOnCircle(PointF(mCenterX, mCenterY), radiusA, angelA)
+        pB = PointHelper.getPointOnCircle(PointF(mCenterX, mCenterY), radiusB, angelB)
+        pC = PointHelper.getPointOnCircle(PointF(mCenterX, mCenterY), radiusC, angelC)
+        pD = PointHelper.getPointOnCircle(PointF(mCenterX, mCenterY), radiusD, angelD)
     }
 
     /**
@@ -111,14 +235,38 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
         canvas?.restore()
     }
 
+    /**
+     * 绘制需要转动部分的 bitmap
+     * @param canvas
+     * @param path 绘制需要旋转的部分
+     * @param p 旋转各轴的角度
+     */
+    private fun drawRotateBitmap(canvas: Canvas?, path: Path, p: Point3DF) {
+        val picWidth = mPicBitmap!!.width
+        val picHeight = mPicBitmap!!.height
+        canvas?.save()
+        canvas?.clipPath(path)
+        mCamera.save()
+        mCamera.rotateX(p.x)
+        mCamera.rotateY(p.y)
+        mCamera.rotateZ(p.z)
+        canvas?.translate(mCenterX, mCenterY)
+        mCamera.applyToCanvas(canvas)
+        canvas?.translate(-mCenterX, -mCenterY)
+        mCamera.restore()
+        canvas?.drawBitmap(mPicBitmap, (width - picWidth) / 2f, (height - picHeight) / 2f, mBitmapPaint)
+        canvas?.restore()
+    }
+
     /** 创建动画 */
     private fun newAnimator() {
-        mValueAnimator = ValueAnimator.ofFloat(0f, 1f)
-        mValueAnimator?.duration = 1200
+        mValueAnimator = ValueAnimator.ofFloat(0f, 1f, 0f)
+        mValueAnimator?.interpolator = AccelerateDecelerateInterpolator()
+//        mValueAnimator?.interpolator = LinearInterpolator()
+        mValueAnimator?.duration = 2400
         mValueAnimator?.repeatCount = -1
         mValueAnimator?.addUpdateListener {
-            mCurValue = it.animatedValue as Float * 2f
-            if (mCurValue > 1f) mCurValue = 2f - mCurValue
+            mCurValue = it.animatedValue as Float * 270
             postInvalidate()
         }
     }
