@@ -44,12 +44,15 @@ class MainActivity : AppCompatActivity() {
         carMap["大众"] = 0.14f
         carMap["奔驰"] = 0.16f
         mPieChart.setData(carMap)
+        // TODO 红板报动画另类仿制
+        mFlipBoardView.setOnClickListener {
+            mFlipBoardView.startAnimator()
+        }
     }
 
     override fun onResume() {
         super.onResume()
         flipping.startLoadedAnimation()
-        mFlipBoardView.startAnimator()
     }
 
     override fun onPause() {

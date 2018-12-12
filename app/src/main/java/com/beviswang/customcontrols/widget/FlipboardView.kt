@@ -1,5 +1,6 @@
 package com.beviswang.customcontrols.widget
 
+import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
@@ -29,12 +30,15 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
     private var mBitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)     // 图片绘制画笔
     private var mCamera: Camera = Camera()                       // Camera
     // 动画属性
-    private var mValueAnimator: ValueAnimator? = null           // 动画类
+    private var mAnimatorSet: AnimatorSet? = null
+    private var mValueAnimator1: ValueAnimator? = null           // 动画类1
+    private var mValueAnimator2: ValueAnimator? = null           // 动画类2
+    private var mValueAnimator3: ValueAnimator? = null           // 动画类3
     private var mCurValue: Float = 0f                           // 当前动画进度 0f-1f
     // 上次的动画进度，记录 mCurValue
     private var mLastValue = 0f
     // 镜头最大翻转角度
-    private val maxAngel = 30
+    private var maxAngel = 0f
 
     /**
      * 旋转矩形的四个点坐标
@@ -59,19 +63,21 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
     private var angelD = 45f
 
     init {
-        mPicBitmap = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_flipboard_logo)
+        mPicBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.flipboard_logo_400px)
     }
 
     /** 开启动画 */
     fun startAnimator() {
-        if (mValueAnimator == null) newAnimator()
-        if (mValueAnimator?.isRunning == true) return
-        mValueAnimator?.start()
+        if (mAnimatorSet == null) newAnimator()
+        if (mAnimatorSet?.isRunning == true) return
+        mCurValue = 0f
+        maxAngel = 0f
+        mAnimatorSet?.start()
     }
 
     /** 暂停动画 */
     fun pauseAnimator() {
-        if (mValueAnimator?.isRunning == true) mValueAnimator?.pause()
+        if (mAnimatorSet?.isRunning == true) mAnimatorSet?.pause()
     }
 
     /** 设置需要翻转的图片 Bitmap */
@@ -98,7 +104,7 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         // 调整 bitmap 大小
-        mPicBitmap = BitmapHelper.scaleBitmap(mPicBitmap, mPicBitmap!!.width * 2, mPicBitmap!!.height * 2)
+        mPicBitmap = BitmapHelper.scaleBitmap(mPicBitmap, w / 3 * 2, w / 3 * 2)
 
         mCenterX = width / 2f
         mCenterY = height / 2f
@@ -260,21 +266,36 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
 
     /** 创建动画 */
     private fun newAnimator() {
-        mValueAnimator = ValueAnimator.ofFloat(0f, 1f, 0f)
-        mValueAnimator?.interpolator = AccelerateDecelerateInterpolator()
-//        mValueAnimator?.interpolator = LinearInterpolator()
-        mValueAnimator?.duration = 2400
-        mValueAnimator?.repeatCount = -1
-        mValueAnimator?.addUpdateListener {
+        mValueAnimator1 = ValueAnimator.ofFloat(0f, 1f)
+        mValueAnimator1?.interpolator = AccelerateDecelerateInterpolator()
+        mValueAnimator1?.duration = 1200
+        mValueAnimator1?.addUpdateListener {
             mCurValue = it.animatedValue as Float * 270
             postInvalidate()
         }
+
+        mValueAnimator2 = ValueAnimator.ofFloat(0f, 1f, 1f)
+        mValueAnimator2?.duration = 1800
+        mValueAnimator2?.addUpdateListener {
+            maxAngel = it.animatedValue as Float * MAX_ANGEL
+            postInvalidate()
+        }
+
+        mValueAnimator3 = ValueAnimator.ofFloat(1f, 1f, 0f)
+        mValueAnimator3?.duration = 1800
+        mValueAnimator3?.addUpdateListener {
+            maxAngel = it.animatedValue as Float * MAX_ANGEL
+            postInvalidate()
+        }
+
+        mAnimatorSet = AnimatorSet()
+        mAnimatorSet?.playSequentially(mValueAnimator2, mValueAnimator1, mValueAnimator3)
     }
 
     /** 移除动画 */
     private fun removeAnimator() {
-        if (mValueAnimator?.isRunning == true) mValueAnimator?.cancel()
-        mValueAnimator = null
+        if (mAnimatorSet?.isRunning == true) mAnimatorSet?.cancel()
+        mAnimatorSet = null
     }
 
     override fun onDetachedFromWindow() {
@@ -288,5 +309,9 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
     private fun dip2px(context: Context, dp: Float): Float {
         val scale = context.resources.displayMetrics.density
         return dp * scale + 0.5f
+    }
+
+    companion object {
+        private const val MAX_ANGEL = 30
     }
 }
