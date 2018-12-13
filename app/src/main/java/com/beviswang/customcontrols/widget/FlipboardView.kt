@@ -64,6 +64,8 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
 
     init {
         mPicBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.flipboard_logo_400px)
+        // 摄像头单位 英寸，在 Android 中换算为 1英寸72像素，同时需要适配屏幕，故出此算法
+        mCamera.setLocation(0f, 0f, dip2px(context, -576f) / 72)
     }
 
     /** 开启动画 */
@@ -169,7 +171,7 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
         val picWidth = mPicBitmap!!.width
         val picHeight = mPicBitmap!!.height
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        paint.style = Paint.Style.FILL_AND_STROKE
+        paint.style = Paint.Style.FILL
         paint.color = Color.BLUE
 
         val destBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
