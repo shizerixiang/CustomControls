@@ -8,10 +8,10 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
-import com.beviswang.customcontrols.R
 import com.beviswang.customcontrols.graphics.Point3DF
 import com.beviswang.customcontrols.graphics.PointHelper
 import com.beviswang.customcontrols.util.BitmapHelper
+import com.beviswang.customcontrols.R
 
 /**
  * 自定义翻版控件
@@ -183,7 +183,7 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
         val srcCanvas = Canvas(bitmap)
 
         val saved = srcCanvas.saveLayer(null, null, Canvas.ALL_SAVE_FLAG)
-        srcCanvas.drawBitmap(mPicBitmap, (width - picWidth) / 2f, (height - picHeight) / 2f, paint)
+        srcCanvas.drawBitmap(mPicBitmap!!, (width - picWidth) / 2f, (height - picHeight) / 2f, paint)
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_OUT)
         srcCanvas.drawBitmap(destBitmap, 0f, 0f, paint)
         paint.xfermode = null
@@ -239,7 +239,7 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
         mCamera.applyToCanvas(canvas)
         canvas?.translate(-mCenterX, -mCenterY)
         mCamera.restore()
-        canvas?.drawBitmap(mPicBitmap, (width - picWidth) / 2f, (height - picHeight) / 2f, mBitmapPaint)
+        canvas?.drawBitmap(mPicBitmap!!, (width - picWidth) / 2f, (height - picHeight) / 2f, mBitmapPaint)
         canvas?.restore()
     }
 
@@ -262,7 +262,7 @@ class FlipboardView @JvmOverloads constructor(context: Context, attrs: Attribute
         mCamera.applyToCanvas(canvas)
         canvas?.translate(-mCenterX, -mCenterY)
         mCamera.restore()
-        canvas?.drawBitmap(mPicBitmap, (width - picWidth) / 2f, (height - picHeight) / 2f, mBitmapPaint)
+        canvas?.drawBitmap(mPicBitmap!!, (width - picWidth) / 2f, (height - picHeight) / 2f, mBitmapPaint)
         canvas?.restore()
     }
 

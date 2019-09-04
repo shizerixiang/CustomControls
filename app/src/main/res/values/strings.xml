@@ -1,8 +1,7 @@
 <resources>
-    <string name="app_name">自定义View</string>
+    <string name="app_name">控件集</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="str_search">搜索</string>
-    <string name="app_name_content">dsafldkjfklasfjdklfjdsaklfjljfdksafjds;fjksalfds;fdskfjsl;afdsafkjds;afjdsfodfipeiwupriehfjskajdnvamnfkdsjfldsajfdskfjdskfjkdjfdkjfkfjkfjfjkfjkdfjskjfsjfkdsfjskfjfjfjjfjfjffsdafjsd;fksafjkdsjkafjdlkjk329749787787898787777927837493287fjdskafdsafkdsafjdsafdsafldkjfklasfjdklfjdsaklfjljfdksafjds;fjksalfds;fdskfjsl;afdsafkjds;afjdsfodfipeiwupriehfjskajdnvamnfkdsjfldsajfdskfjdskfjkdjfdkjfkfjkfjfjkfjkdfjskjfsjfkdsfjskfjfjfjjfjfjffsdafjsd;fksafjkdsjkafjdlkjk329749787787898787777927837493287fjdskafdsafkdsafjdsaflksafjdsdsafldkjfklasfjdklfjdsaklfjljfdksafjds;fjksalfds;fdskfjsl;afdsafkjds;afjdsfodfipeiwupriehfjskajdnvamnfkdsjfldsajfdskfjdskfjkdjfdkjfkfjkfjfjkfjkdfjskjfsjfkdsfjskfjfjfjjfjfjffsdafjsd;fksafjkdsjkafjdlkjk329749787787898787777927837493287fjdskafdsafkdsafjdsaflksafjdsdsafldkjfklasfjdklfjdsaklfjljfdksafjds;fjksalfds;fdskfjsl;afdsafkjds;afjdsfodfipeiwupriehfjskajdnvamnfkdsjfldsajfdskfjdskfjkdjfdkjfkfjkfjfjkfjkdfjskjfsjfkdsfjskfjfjfjjfjfjffsdafjsd;fksafjkdsjkafjdlkjk329749787787898787777927837493287fjdskafdsafkdsafjdsaflksafjdslksafjds</string>
 </resources>

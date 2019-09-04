@@ -1,4 +1,4 @@
-package com.beviswang.customcontrols.graphics
+package com.bevis.bevisui.graphics
 
 import android.animation.TypeEvaluator
 import android.graphics.PointF

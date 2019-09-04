@@ -11,7 +11,7 @@
         android:id="@+id/mWeatherImg"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@mipmap/ic_flipboard_logo" />
+        android:src="@mipmap/ic_launcher" />
 
     <TextView
         android:id="@+id/mWeatherTem"

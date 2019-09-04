@@ -2,9 +2,8 @@ package com.beviswang.customcontrols.widget
 
 import android.content.Context
 import android.graphics.*
-import android.support.annotation.ColorInt
+import androidx.annotation.ColorInt
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import org.jetbrains.anko.doAsync
 import java.util.*

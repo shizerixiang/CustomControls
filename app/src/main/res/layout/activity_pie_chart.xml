@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorTitleText"
+    tools:context=".activity.PieChartActivity">
+
+    <include layout="@layout/layout_tool_bar" />
+
+    <com.beviswang.customcontrols.widget.PieChartView
+        android:id="@+id/pcv_pie_chart"
+        android:layout_width="0dp"
+        android:layout_height="380dp"
+        android:layout_below="@id/headerBar4"
+        android:padding="96dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cl_tool_bar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

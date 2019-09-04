@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".IndexActivity">
+
+    <com.beviswang.customcontrols.widget.ScrollerLayout
+        android:id="@+id/acct"
+        android:layout_width="300dp"
+        android:layout_height="104dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:background="#eee"
+        android:elevation="2dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_drag_handle"
+            android:textSize="12sp" />
+
+        <View
+            android:id="@+id/headerBar"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_marginStart="80dp"
+            android:background="#eee"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <com.beviswang.customcontrols.widget.WaveView
+            android:id="@+id/waveView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/headerBar" />
+
+        <com.beviswang.customcontrols.widget.TemplateViewGroup
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:layout_below="@id/headerBar">
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle1"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#afff" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle2"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#aff0" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle3"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#af00" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle4"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#a000" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle5"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#a00f" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle6"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#a0ff" />
+
+            <com.beviswang.customcontrols.widget.TemplateView
+                android:id="@+id/circle7"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                app:circle_color="#a0f0" />
+
+        </com.beviswang.customcontrols.widget.TemplateViewGroup>
+
+    </com.beviswang.customcontrols.widget.ScrollerLayout>
+
+    <com.beviswang.customcontrols.widget.ScrollerLayout
+        android:layout_width="300dp"
+        android:layout_height="244dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:background="#fff"
+        android:elevation="3dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_drag_handle"
+            android:textSize="12sp" />
+
+        <View
+            android:id="@+id/headerBar2"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_marginStart="80dp"
+            android:background="#fff"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="47dp"
+            android:layout_below="@id/headerBar2"
+            android:background="#fff"
+            android:elevation="1dp" />
+
+        <com.beviswang.customcontrols.widget.ZoomTabLayout
+            android:id="@+id/zoomTabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_below="@id/headerBar2"
+            android:elevation="2dp"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:paddingEnd="146dp"
+            android:paddingStart="26dp" />
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/zoomTabLayout"
+            android:layout_marginTop="-9dp" />
+
+    </com.beviswang.customcontrols.widget.ScrollerLayout>
+
+    <com.beviswang.customcontrols.widget.ScrollerLayout
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="36dp"
+        android:background="#fff"
+        android:elevation="4dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_drag_handle"
+            android:textSize="12sp" />
+
+        <View
+            android:id="@+id/headerBar3"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_marginStart="80dp"
+            android:background="#fff"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <com.beviswang.customcontrols.widget.FlippingView
+            android:id="@+id/flipping"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/headerBar3"
+            android:background="#ee2266ff"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="18dp" />
+
+    </com.beviswang.customcontrols.widget.ScrollerLayout>
+
+    <com.beviswang.customcontrols.widget.ScrollerLayout
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="48dp"
+        android:background="#fff"
+        android:elevation="5dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_drag_handle"
+            android:textSize="12sp" />
+
+        <View
+            android:id="@+id/headerBar4"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_marginStart="80dp"
+            android:background="#fff"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <com.beviswang.customcontrols.widget.PieChartView
+            android:id="@+id/mPieChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/headerBar4"
+            android:background="@color/colorPrimary"
+            android:padding="72dp" />
+
+    </com.beviswang.customcontrols.widget.ScrollerLayout>
+
+    <com.beviswang.customcontrols.widget.ScrollerLayout
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="60dp"
+        android:background="#fff"
+        android:elevation="6dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_drag_handle"
+            android:textSize="12sp" />
+
+        <View
+            android:id="@+id/headerBar5"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_marginStart="80dp"
+            android:background="#fff"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <com.beviswang.customcontrols.widget.FlipboardView
+            android:id="@+id/mFlipBoardView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/headerBar5"
+            android:background="#ccc"
+            android:padding="72dp" />
+
+    </com.beviswang.customcontrols.widget.ScrollerLayout>
+
+</RelativeLayout>

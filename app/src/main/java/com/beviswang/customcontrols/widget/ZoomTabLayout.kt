@@ -2,8 +2,8 @@ package com.beviswang.customcontrols.widget
 
 import android.content.Context
 import android.graphics.Color
-import android.support.annotation.ColorInt
-import android.support.v4.view.ViewPager
+import androidx.annotation.ColorInt
+import androidx.viewpager.widget.ViewPager
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import com.beviswang.customcontrols.R
@@ -51,7 +51,7 @@ class ZoomTabLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         mItemPadding = typeArray.getInt(R.styleable.ZoomTabLayout_zoomTabPadding, dip2px(context, 8f).toInt())
         mNormalTextSize = typeArray.getFloat(R.styleable.ZoomTabLayout_zoomTabUnSelectTextSize, sp2px(context, 14f))
         mSelectTextSize = typeArray.getFloat(R.styleable.ZoomTabLayout_zoomTabSelectTextSize, sp2px(context, 28f))
-        mDefSelected = typeArray.getInt(R.styleable.ZoomTabLayout_zoomTabDefaultSelected, 1)
+        mDefSelected = typeArray.getInt(R.styleable.ZoomTabLayout_zoomTabDefaultSelected, 0)
         mSelectIndex = mDefSelected
         typeArray.recycle()
     }
@@ -82,7 +82,7 @@ class ZoomTabLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         getChildAt(0).setPadding(paddingStart, 0, mItemPadding / 2, 0)
         getChildAt(childCount - 1).setPadding(mItemPadding / 2, 0, paddingEnd, 0)
         setPadding(0, paddingTop, 0, paddingBottom)
-        // 设置首个 Tab 默认为选中状态
+        // 设置某个 Tab 默认为选中状态
         (getChildAt(mDefSelected) as TabView).setScrollScale(1f)
     }
 

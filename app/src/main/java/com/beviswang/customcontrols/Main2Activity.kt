@@ -1,14 +1,11 @@
 package com.beviswang.customcontrols
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.support.constraint.ConstraintLayout
-import android.widget.RelativeLayout
-import com.beviswang.customcontrols.util.KeyboardHeightProvider
+import androidx.constraintlayout.widget.ConstraintLayout
+import com.beviswang.customcontrols.widget.KeyboardHeightProvider
 import kotlinx.android.synthetic.main.activity_main2.*
-import org.jetbrains.anko.alignParentBottom
-import org.jetbrains.anko.centerHorizontally
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -21,7 +18,7 @@ class Main2Activity : AppCompatActivity(), KeyboardHeightProvider.KeyboardHeight
 
         mKeyboardHeightProvider = KeyboardHeightProvider(this)
 
-        mWeatherLayout.setOnClickListener { it ->
+        mWeatherLayout.setOnClickListener {
             doAsync {
                 (0..100).forEach { i ->
                     uiThread {

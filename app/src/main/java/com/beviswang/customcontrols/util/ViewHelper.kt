@@ -2,6 +2,7 @@ package com.beviswang.customcontrols.util
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Rect
 import android.util.DisplayMetrics
 import android.view.View
@@ -87,5 +88,15 @@ object ViewHelper {
     fun sp2px(context: Context, sp: Float): Float {
         val scale = context.resources.displayMetrics.scaledDensity
         return sp * scale + 0.5f
+    }
+
+    /**
+     * 获取布局截图 bitmap
+     * @param view 需要获取的 View
+     */
+    fun getViewScreenShot(view: View): Bitmap? {
+        view.isDrawingCacheEnabled = true
+        view.buildDrawingCache()
+        return view.drawingCache
     }
 }

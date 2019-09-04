@@ -11,18 +11,17 @@ ext {
             // About AAPT2 error:The compileSdkVersion if too low, AAPT2 will be error,We can close the AAPT2
             // Add android.enableAapt2=false in gradle.properties file.
             // You must know that this problem is likely to be a problem with your code.
-            compileSdkVersion        : 27,
+            compileSdkVersion        : 28,
             applicationId            : "com.beviswang.customcontrols",
             minSdkVersion            : 21,
-            targetSdkVersion         : 27,
+            targetSdkVersion         : 28,
             versionCode              : 1,
-            versionName              : "1.0",
-            testInstrumentationRunner: "android.support.test.runner.AndroidJUnitRunner"
+            versionName              : "1.0.0",
+            testInstrumentationRunner: "androidx.test.runner.AndroidJUnitRunner"
     ]
 
     dependencies = [
             // Google android support dependencies
-
             appcompat_v7      : "com.android.support:appcompat-v7:$android_support_version",
             support_v4        : "com.android.support:support-v4:$android_support_version",
             support_v13       : "com.android.support:support-v13:$android_support_version",

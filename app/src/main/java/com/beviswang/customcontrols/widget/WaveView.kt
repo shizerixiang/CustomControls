@@ -12,7 +12,7 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 
 /**
- * 水波纹
+ * 水波纹波动动画
  * @author BevisWang
  * @date 2018/11/14 16:13
  */

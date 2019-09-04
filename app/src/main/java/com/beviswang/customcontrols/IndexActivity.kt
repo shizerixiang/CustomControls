@@ -1,30 +1,31 @@
 package com.beviswang.customcontrols
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.beviswang.customcontrols.util.ViewHelper
 import com.beviswang.customcontrols.adapter.ZoomTabViewPagerAdapter
 import com.beviswang.customcontrols.fragment.AFragment
-import com.beviswang.customcontrols.util.ViewHelper
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_index.*
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
- * MainActivity
+ * IndexActivity
  * @author BevisWang
  * @date 2018/11/14 16:14
  */
-class MainActivity : AppCompatActivity() {
+class IndexActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_index)
 
         headerBar.setOnClickListener {
             waveView.startWave()
         }
 
-        zoomTabLayout.setTabTextSize(ViewHelper.sp2px(this@MainActivity, 14f))
+        zoomTabLayout.setTabTextSize(ViewHelper.sp2px(this@IndexActivity, 14f))
         zoomTabLayout.setItems(arrayOf("乐库", "推荐", "趴间", "看点"))
-        zoomTabLayout.setItemPadding(ViewHelper.dip2px(this@MainActivity, 20f).toInt())
+        zoomTabLayout.setItemPadding(ViewHelper.dip2px(this@IndexActivity, 20f).toInt())
         viewPager.adapter = ZoomTabViewPagerAdapter(arrayOf(
                 AFragment.newInstance("乐库", "乐库"),
                 AFragment.newInstance("推荐", "推荐"),
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         carMap["奔驰"] = 0.16f
         mPieChart.setData(carMap)
         // TODO 红板报动画另类仿制
-        mFlipBoardView.setOnClickListener {
+        mFlipBoardView.onClick {
             mFlipBoardView.startAnimator()
         }
     }

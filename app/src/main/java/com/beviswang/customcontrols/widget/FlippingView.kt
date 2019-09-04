@@ -4,7 +4,7 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
-import android.support.annotation.ColorInt
+import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -200,6 +200,7 @@ class FlippingView @JvmOverloads constructor(context: Context, attrs: AttributeS
         if (progressValue < 0 || progressValue > 360)
             throw IndexOutOfBoundsException("进度值越界！范围 0-360，当前 $progressValue ！")
         mCurProgress = progressValue
+        postInvalidate()
     }
 
     /** 开启渐变动画 */
