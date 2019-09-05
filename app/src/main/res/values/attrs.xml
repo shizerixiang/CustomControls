@@ -20,4 +20,11 @@
         <!-- Tab 默认选中项 -->
         <attr name="zoomTabDefaultSelected" format="integer" />
     </declare-styleable>
+
+    <!-- 带特效的小球属性 -->
+    <declare-styleable name="RocketMapView">
+        <attr name="colorLine" format="color" />
+        <attr name="flyImage" format="dimension" />
+        <attr name="flyImageSize" format="integer|dimension" />
+    </declare-styleable>
 </resources>

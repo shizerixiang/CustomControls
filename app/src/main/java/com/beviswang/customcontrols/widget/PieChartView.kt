@@ -123,8 +123,8 @@ class PieChartView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * 两点间的距离公式：
      * ab = Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
      * 两点直线与 x 轴的夹角
-     * var p1:Point = new Point(40,30);
-     * var p2:Point = new Point(80,60);
+     * var p1:Point2D = new Point2D(40,30);
+     * var p2:Point2D = new Point2D(80,60);
      *
      * var angle:Number = Math.atan2((p2.y-p1.y), (p2.x-p1.x)) // 弧度
      * var theta:Number = angle*(180/Math.PI); // 角度

@@ -5,7 +5,7 @@ import android.os.Parcel
 import android.os.Parcelable
 
 /**
- * Point in 3D holds three float coordinates
+ * Point2D in 3D holds three float coordinates
  * @author BevisWang
  */
 class Point3DF : Parcelable {
@@ -76,7 +76,7 @@ class Point3DF : Parcelable {
     }
 
     override fun toString(): String {
-        return "Point($x, $y, $z)"
+        return "Point2D($x, $y, $z)"
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

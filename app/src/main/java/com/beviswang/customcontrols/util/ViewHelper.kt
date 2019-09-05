@@ -92,6 +92,7 @@ object ViewHelper {
 
     /**
      * 获取布局截图 bitmap
+     * 官方推荐 PixelCopy 类做截屏处理
      * @param view 需要获取的 View
      */
     fun getViewScreenShot(view: View): Bitmap? {
