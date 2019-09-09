@@ -12,6 +12,7 @@ import android.view.animation.LinearInterpolator
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import com.beviswang.customcontrols.R
+import com.beviswang.customcontrols.graphics.PointHelper
 import com.beviswang.customcontrols.util.BitmapHelper
 import com.beviswang.customcontrols.util.ViewHelper
 import org.jetbrains.anko.doAsync
@@ -415,7 +416,7 @@ class RocketMapView @JvmOverloads constructor(context: Context, attrs: Attribute
          * [ROCKET_STATE_URGENT_ORDER] [ROCKET_STATE_NORMAL_ORDER_RETURN]
          */
         private var state: Int
-//        private var normalOrder: Order                                      // 普通指令
+        //        private var normalOrder: Order                                      // 普通指令
         private var normalOrder: NormalOrder                                      // 普通指令
         private var urgentOrder: Order? = null                              // 紧急指令
         private var normalOrderAnimator: ValueAnimator? = null              // 普通指令动画
@@ -619,10 +620,9 @@ class RocketMapView @JvmOverloads constructor(context: Context, attrs: Attribute
             private var moveOrder: Order? = null                            // 执行普通指令时，没有处于普通指令的路径中，则需要该指令过渡到普通指令
             private var orderMatrix: Matrix
 
-            private val bufferFactor: Float = 90f                           // 缓冲因子，即：在只确定方向的情况下，转向该方向所损耗的路程
+            private val bufferFactor: Float = 200f                          // 缓冲因子，即：在只确定方向的情况下，转向该方向所损耗的路程（根据固定的减速度，从当前速度到0时所消耗的路程长度）
 
-
-            var mTanPath:Path = Path()
+            var mTanPath: Path = Path()
 
             init {
                 generatePath(startPoint)
@@ -644,45 +644,20 @@ class RocketMapView @JvmOverloads constructor(context: Context, attrs: Attribute
              * @param o 原点
              */
             private fun getStartTargetPoint(p: PointF, o: PointF): PointF {
-//                // 这里基于 o 点的坐标轴，即：o 为原点（相对坐标系）
-//                val x = p.x - o.x
-//                val y = p.y - o.y
-//                // 从原点到圆上一点的直线的斜率 y = kx -> k = y / x
-//                val k = y / x
-//                // 垂直于该直线的直线和该直线的斜率乘积为 -1      vk * k = -1 -> vk = -1 / k
-//                val vk = -1 / k
-//                val m = y - (vk * x)
-//                // 公式：y = vk * x + m
-//                // 假定我要取此直线上距离已知点 point.x + 40 的 x 坐标，可求出 y 的坐标
-//                val tx = x + bufferFactor
-//                val ty = vk * x + m
-//                // 转回 map 的绝对坐标系
-//                return PointF(tx + o.x, ty + o.y)
-
-                // 这里基于 o 点的坐标轴，即：o 为原点（相对坐标系）
-                val x = p.x
-                val y = p.y
-                // 从原点到圆上一点的直线的斜率 y = kx -> k = y / x
-                val k = y / x
-                // 垂直于该直线的直线和该直线的斜率乘积为 -1      vk * k = -1 -> vk = -1 / k
-                val vk = -1 / k
-                val m = y - (vk * x)
-                // 公式：y = vk * x + m
-                // 假定我要取此直线上距离已知点 point.x + 40 的 x 坐标，可求出 y 的坐标
-                val tx = x + bufferFactor
-                val ty = vk * x + m
-
+                val tp = PointHelper.getVectorPointInCircle(o, p, bufferFactor, true)
                 mTanPath = Path()
-                mTanPath.moveTo(x,y)
-                mTanPath.lineTo(tx,ty)
-
-                return PointF(tx, ty)
+                mTanPath.moveTo(0f, 0f)
+                mTanPath.lineTo(p.x, p.y)
+                mTanPath.lineTo(tp.x, tp.y)
+                return tp
             }
 
             private fun getPointOnPath(progress: Float): PointF {
                 val pos = floatArrayOf(0f, 0f)
                 val tan = floatArrayOf(0f, 0f)
                 pathMeasure.getPosTan(totalDistance * progress, pos, tan)
+                val degrees: Float = (Math.atan2(tan[1].toDouble(), tan[0].toDouble()) * 180f / Math.PI).toFloat()
+                Log.e("点的角度", "degrees=$degrees")
                 return PointF(pos[0], pos[1])
             }
 
