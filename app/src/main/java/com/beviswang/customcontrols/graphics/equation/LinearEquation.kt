@@ -61,36 +61,12 @@ class LinearEquation private constructor() : IEquation {
      * @param degreeX 直线与 X 轴的夹角
      */
     private fun setPointDegreeX(p1: PointF, degreeX: Float) {
-        // TODO 通过夹角求直线方程
+        val px2 = p1.x+(p1.y/Math.tan(degreeX.toDouble())).toFloat()
+        val py2 = 0f
+        set2Point(p1, PointF(px2,py2))
     }
 
     override fun getY(x: Float) = k * x + b
 
     override fun getX(y: Float) = (y - b) / k
-
-    class Builder() {
-        private var mLinearEquation: LinearEquation
-        private var p1: PointF? = null
-        private var k: Float? = null
-
-        init {
-            mLinearEquation = LinearEquation()
-        }
-
-        fun addPoint(p: PointF): Builder {
-            if (p1 == null) {
-                this.p1 = p
-                return this
-            }
-            mLinearEquation.set2Point(p1!!, p)
-            return this
-        }
-
-        fun addK(k: Float): Builder {
-            // TODO add k
-            return this
-        }
-
-        fun create(): LinearEquation = mLinearEquation
-    }
 }
