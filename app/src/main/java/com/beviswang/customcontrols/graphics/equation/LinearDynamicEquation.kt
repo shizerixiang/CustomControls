@@ -1,0 +1,51 @@
+package com.beviswang.customcontrols.graphics.equation
+
+import android.graphics.PointF
+
+/**
+ * 动态直线方程（动态根据现在的点进行方程更新，比较吃性能）
+ * 直线公式：y = k * x + b
+ * @author BevisWang
+ * @date 2019/9/9 16:44
+ */
+class LinearDynamicEquation private constructor() : IEquation {
+    private var p1: PointF = PointF()
+    private var p2: PointF = PointF()
+    private var k: Float = 0f   // 斜率
+    private var b: Float = 0f   // 偏移量
+
+    constructor(p1: PointF, p2: PointF) : this() {
+        set2Point(p1, p2)
+    }
+
+    /**
+     * 通过直线上两点生成直线方程
+     * @param p1 点一
+     * @param p2 点二
+     */
+    private fun set2Point(p1: PointF, p2: PointF) {
+        this.p1 = p1
+        this.p2 = p2
+        update()
+    }
+
+    /** 更新方程 */
+    fun update() {
+        k = (p2.y - p1.y) / (p2.x - p1.x)
+        b = p1.y - (k * p1.x)
+    }
+
+    override fun getY(x: Float): Float {
+        update()
+        return k * x + b
+    }
+
+    override fun getX(y: Float): Float {
+        update()
+        return (y - b) / k
+    }
+
+    override fun getCurPoint(progress: Float): PointF {
+        return PointF()
+    }
+}

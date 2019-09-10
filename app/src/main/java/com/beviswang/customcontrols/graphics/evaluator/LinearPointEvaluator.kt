@@ -1,12 +1,13 @@
-package com.bevis.bevisui.graphics
+package com.beviswang.customcontrols.graphics.evaluator
 
 import android.animation.TypeEvaluator
 import android.graphics.PointF
 
 /**
  * This evaluator can be used to perform type interpolation between `PointF` values.
+ * 点与点的直线移动求值器
  */
-class PointFEvaluator : TypeEvaluator<PointF> {
+class LinearPointEvaluator : TypeEvaluator<PointF> {
 
     /**
      * When null, a new PointF is returned on every evaluate call. When non-null,
@@ -15,15 +16,15 @@ class PointFEvaluator : TypeEvaluator<PointF> {
     private var mPoint: PointF? = null
 
     /**
-     * Construct a PointFEvaluator that returns a new PointF on every evaluate call.
+     * Construct a LinearPointEvaluator that returns a new PointF on every evaluate call.
      * To avoid creating an object for each evaluate call,
-     * [PointFEvaluator] should be used
+     * [LinearPointEvaluator] should be used
      * whenever possible.
      */
     constructor() {}
 
     /**
-     * Constructs a PointFEvaluator that modifies and returns `reuse`
+     * Constructs a LinearPointEvaluator that modifies and returns `reuse`
      * in [.evaluate] calls.
      * The value returned from
      * [.evaluate] should
@@ -44,8 +45,8 @@ class PointFEvaluator : TypeEvaluator<PointF> {
      * (x, y).
      *
      *
-     * If [.PointFEvaluator] was used to construct
-     * this PointFEvaluator, the object returned will be the `reuse`
+     * If [.LinearPointEvaluator] was used to construct
+     * this LinearPointEvaluator, the object returned will be the `reuse`
      * passed into the constructor.
      *
      * @param fraction   The fraction from the starting to the ending values

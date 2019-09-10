@@ -17,6 +17,7 @@ import android.graphics.PointF
  * @author BevisWang
  * @date 2019/9/9 17:47
  */
+@Deprecated("暂时无法使用")
 class CircleEquation private constructor(): IEquation {
     private var o: PointF = PointF(0f, 0f)          // 圆心
     private var r: Float = 0f                               // 圆半径

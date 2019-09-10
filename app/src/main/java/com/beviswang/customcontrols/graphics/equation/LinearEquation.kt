@@ -3,7 +3,7 @@ package com.beviswang.customcontrols.graphics.equation
 import android.graphics.PointF
 
 /**
- * 直线方程
+ * 直线方程（静态，比较节省性能，但无法动态根据点更新方程）
  * 直线公式：y = k * x + b
  * @author BevisWang
  * @date 2019/9/9 16:44
@@ -40,7 +40,7 @@ class LinearEquation private constructor() : IEquation {
      * @param p1 点一
      * @param p2 点二
      */
-    private fun set2Point(p1: PointF, p2: PointF) {
+    protected fun set2Point(p1: PointF, p2: PointF) {
         k = (p2.y - p1.y) / (p2.x - p1.x)
         b = p1.y - (k * p1.x)
     }
@@ -69,4 +69,8 @@ class LinearEquation private constructor() : IEquation {
     override fun getY(x: Float) = k * x + b
 
     override fun getX(y: Float) = (y - b) / k
+
+    override fun getCurPoint(progress: Float): PointF {
+        return PointF()
+    }
 }

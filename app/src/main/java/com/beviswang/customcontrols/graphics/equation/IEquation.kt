@@ -1,5 +1,7 @@
 package com.beviswang.customcontrols.graphics.equation
 
+import android.graphics.PointF
+
 /**
  * 方程
  * @author BevisWang
@@ -19,4 +21,11 @@ interface IEquation {
      * @return y
      */
     fun getY(x: Float): Float
+
+    /**
+     * 根据距离进度比例，获取两点间的点
+     * @param progress 进度比例
+     * @return 获得的点
+     */
+    fun getCurPoint(progress:Float):PointF
 }

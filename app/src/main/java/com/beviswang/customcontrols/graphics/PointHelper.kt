@@ -21,29 +21,41 @@ object PointHelper {
      *
      * @param centerPoint 圆心坐标
      * @param r 圆的半径
-     * @param angel 获取点的角度
+     * @param degrees 获取点的角度
      * @return 圆上的点坐标
      */
-    fun getPointOnCircle(centerPoint: PointF, r: Float, angel: Float) = PointF(getPointX(
-            centerPoint.x, r, angel), getPointY(centerPoint.y, r, angel))
+    fun getPointOnCircle(centerPoint: PointF, r: Float, degrees: Float) = PointF(getPointX(
+            centerPoint.x, r, degrees), getPointY(centerPoint.y, r, degrees))
 
     /**
      * 获取圆上点的 X 轴坐标
      * @param centerX 圆心 X 轴坐标
      * @param r 半径
-     * @param angel 角度
+     * @param degrees 角度
      * @return 圆上点的 X 轴坐标
      */
-    fun getPointX(centerX: Float, r: Float, angel: Float) = centerX + r * Math.cos(angel * Math.PI / 180).toFloat()
+    fun getPointX(centerX: Float, r: Float, degrees: Float) = centerX + r * Math.cos(Math.toRadians(degrees.toDouble())).toFloat()
 
     /**
      * 获取圆上点的 Y 轴坐标
      * @param centerY 圆心 Y 轴坐标
      * @param r 半径
-     * @param angel 角度
+     * @param degrees 角度
      * @return 圆上点的 Y 轴坐标
      */
-    fun getPointY(centerY: Float, r: Float, angel: Float) = centerY + r * Math.sin(angel * Math.PI / 180).toFloat()
+    fun getPointY(centerY: Float, r: Float, degrees: Float) = centerY + r * Math.sin(Math.toRadians(degrees.toDouble())).toFloat()
+
+    /**
+     * 获取两点间的距离
+     * @param p1 点一
+     * @param p2 点二
+     * @return 两点间的距离
+     */
+    fun getPointsDistance(p1: PointF, p2: PointF): Float {
+        val dx = p2.x - p1.x
+        val dy = p2.y - p1.x
+        return Math.sqrt(Math.pow(dx.toDouble(), 2.0) + Math.pow(dy.toDouble(), 2.0)).toFloat()
+    }
 
     /**
      * 通过指定大小和方向，获取做圆周运动的圆上一点的向量终点
