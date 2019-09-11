@@ -1,5 +1,6 @@
 package com.beviswang.customcontrols.graphics.equation
 
+import android.graphics.Path
 import android.graphics.PointF
 
 /**
@@ -9,6 +10,8 @@ import android.graphics.PointF
  * @date 2019/9/9 16:44
  */
 class LinearEquation private constructor() : IEquation {
+    private var p1: PointF? = null
+    private var p2: PointF? = null
     private var k: Float = 0f   // 斜率
     private var b: Float = 0f   // 偏移量
 
@@ -41,6 +44,8 @@ class LinearEquation private constructor() : IEquation {
      * @param p2 点二
      */
     protected fun set2Point(p1: PointF, p2: PointF) {
+        this.p1 = p1
+        this.p2 = p2
         k = (p2.y - p1.y) / (p2.x - p1.x)
         b = p1.y - (k * p1.x)
     }
@@ -61,16 +66,26 @@ class LinearEquation private constructor() : IEquation {
      * @param degreeX 直线与 X 轴的夹角
      */
     private fun setPointDegreeX(p1: PointF, degreeX: Float) {
-        val px2 = p1.x+(p1.y/Math.tan(degreeX.toDouble())).toFloat()
+        val px2 = p1.x + (p1.y / Math.tan(degreeX.toDouble())).toFloat()
         val py2 = 0f
-        set2Point(p1, PointF(px2,py2))
+        set2Point(p1, PointF(px2, py2))
     }
 
     override fun getY(x: Float) = k * x + b
 
     override fun getX(y: Float) = (y - b) / k
 
-    override fun getCurPoint(progress: Float): PointF {
-        return PointF()
+    override fun getCurPoint(p: PointF, progress: Float) {
+        if (p1 == null || p2 == null) return
+        val x = (p2!!.x - p1!!.x) * progress + p1!!.x
+        val y = getY(x)
+        p.set(x, y)
+    }
+
+    override fun getLinePath(path: Path) {
+        if (p1 == null || p2 == null) return
+        path.reset()
+        path.moveTo(p1!!.x, p1!!.y)
+        path.lineTo(p2!!.x, p2!!.y)
     }
 }

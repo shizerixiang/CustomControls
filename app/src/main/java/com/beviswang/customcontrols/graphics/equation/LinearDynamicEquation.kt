@@ -1,5 +1,6 @@
 package com.beviswang.customcontrols.graphics.equation
 
+import android.graphics.Path
 import android.graphics.PointF
 
 /**
@@ -45,7 +46,16 @@ class LinearDynamicEquation private constructor() : IEquation {
         return (y - b) / k
     }
 
-    override fun getCurPoint(progress: Float): PointF {
-        return PointF()
+    override fun getCurPoint(p: PointF, progress: Float) {
+        update()
+        val x = (p2.x - p1.x) * progress + p1.x
+        val y = getY(x)
+        p.set(x, y)
+    }
+
+    override fun getLinePath(path: Path) {
+        path.reset()
+        path.moveTo(p1.x, p1.y)
+        path.lineTo(p2.x, p2.y)
     }
 }

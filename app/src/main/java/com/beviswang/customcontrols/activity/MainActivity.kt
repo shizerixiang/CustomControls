@@ -41,7 +41,8 @@ class MainActivity : BaseActivity() {
                 getDescModel("可控饼状图", "View 绘制 | 手势控制", PieChartActivity::class.java),
                 getDescModel("仿红板报动画", "View 绘制", FlipBoardActivity::class.java),
                 getDescModel("飞行的火箭", "View 绘制", RocketFlyActivity::class.java),
-                getDescModel("混合图形画板", "View 绘制", MixedBoardActivity::class.java))
+                getDescModel("混合图形画板", "View 绘制", MixedBoardActivity::class.java),
+                getDescModel("贝塞尔曲线演示", "View 绘制", BezierActivity::class.java))
         mLayoutManager = LinearLayoutManager(baseContext, RecyclerView.VERTICAL, false)
         mAdapter = MainAdapter(baseContext, mDataList)
     }

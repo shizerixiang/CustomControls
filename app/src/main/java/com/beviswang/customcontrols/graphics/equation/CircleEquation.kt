@@ -1,5 +1,6 @@
 package com.beviswang.customcontrols.graphics.equation
 
+import android.graphics.Path
 import android.graphics.PointF
 
 /**
@@ -38,5 +39,12 @@ class CircleEquation private constructor(): IEquation {
 
     override fun getY(x: Float): Float {
         return 0f
+    }
+
+    override fun getCurPoint(p:PointF,progress: Float) {
+    }
+
+    override fun getLinePath(path: Path) {
+
     }
 }

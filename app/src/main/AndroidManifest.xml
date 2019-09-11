@@ -11,8 +11,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoTitle"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.MixedBoardActivity"></activity>
-        <!-- 飞行的火箭 -->
+        <!-- 贝塞尔曲线演示 -->
+        <activity android:name=".activity.BezierActivity" />
+        <!-- 混合图形 -->
+        <activity android:name=".activity.MixedBoardActivity" /> <!-- 飞行的火箭 -->
         <activity android:name=".activity.RocketFlyActivity" /> <!-- 仿红板报动画 -->
         <activity android:name=".activity.FlipBoardActivity" /> <!-- 原创可控饼状图 -->
         <activity android:name=".activity.PieChartActivity" /> <!-- 仿小米运动 -->
