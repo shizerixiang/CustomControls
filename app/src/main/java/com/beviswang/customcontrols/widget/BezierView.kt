@@ -1,9 +1,11 @@
 package com.beviswang.customcontrols.widget
 
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
 import com.beviswang.customcontrols.graphics.equation.LinearDynamicEquation
@@ -35,18 +37,18 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
     private var mPath0123: Path = Path()
     private var mPathBezier: Path = Path()
     // 静态方程
-    private var mLinearEquation01: LinearEquation
-    private var mLinearEquation12: LinearEquation
-    private var mLinearEquation23: LinearEquation
+    private lateinit var mLinearEquation01: LinearEquation
+    private lateinit var mLinearEquation12: LinearEquation
+    private lateinit var mLinearEquation23: LinearEquation
     // 动态方程
-    private var mLinearEquation012: LinearDynamicEquation
-    private var mLinearEquation123: LinearDynamicEquation
-    private var mLinearEquation0123: LinearDynamicEquation
+    private lateinit var mLinearEquation012: LinearDynamicEquation
+    private lateinit var mLinearEquation123: LinearDynamicEquation
+    private lateinit var mLinearEquation0123: LinearDynamicEquation
     // 03 起终点 12 控制点
-    private var mPoint0: PointF = PointF(-240f, 440f)
-    private var mPoint1: PointF = PointF(-320f, -240f)
-    private var mPoint2: PointF = PointF(240f, -240f)
-    private var mPoint3: PointF = PointF(440f, 440f)
+    private var mPoint0: PointF = PointF(0f, 0f)
+    private var mPoint1: PointF = PointF(0f, 0f)
+    private var mPoint2: PointF = PointF(0f, 0f)
+    private var mPoint3: PointF = PointF(0f, 0f)
     // 根据进度计算的点
     private var mPoint01: PointF = PointF()
     private var mPoint12: PointF = PointF()
@@ -58,6 +60,9 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
     // 进度 0f-1f
     private var mProgress: Float = 0f
 
+    private var count: Int = 0
+    private var isStartAnimator: Boolean = false
+
     init {
         mPointPaint.style = Paint.Style.STROKE
         mPointPaint.strokeWidth = 20f
@@ -68,6 +73,15 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         mLinePaint.strokeWidth = 4f
         mLinePaint.color = Color.GRAY
 
+        bindLinear()
+
+//        doAsync {
+//            Thread.sleep(800)
+//            uiThread { doDrawingAnimator() }
+//        }
+    }
+
+    private fun bindLinear() {
         mLinearEquation01 = LinearEquation(mPoint0, mPoint1)
         mLinearEquation12 = LinearEquation(mPoint1, mPoint2)
         mLinearEquation23 = LinearEquation(mPoint2, mPoint3)
@@ -87,11 +101,21 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         mLinearEquation0123.getCurPoint(mPoint0123, mProgress)
 
         updateLine()
+    }
 
-        doAsync {
-            Thread.sleep(800)
-            uiThread { doDrawingAnimator() }
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (isStartAnimator || event == null) return super.onTouchEvent(event)
+        when (count) {
+            0 -> mPoint0.set(event.x, event.y)
+            1 -> mPoint1.set(event.x, event.y)
+            2 -> mPoint2.set(event.x, event.y)
+            3 -> mPoint3.set(event.x, event.y)
         }
+        if (event.action == MotionEvent.ACTION_UP) count++
+        if (count > 3) count = 3
+        invalidate()
+        return true
     }
 
     /** 绘制动画 */
@@ -102,6 +126,10 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         mDrawingAnimator?.interpolator = LinearInterpolator()
         mDrawingAnimator?.repeatCount = ValueAnimator.INFINITE
         mDrawingAnimator?.addUpdateListener {
+            if (!isStartAnimator) {
+                it.cancel()
+                return@addUpdateListener
+            }
             mProgress = it.animatedValue as Float
             invalidate()
         }
@@ -118,22 +146,6 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         mLinearEquation123.getCurPoint(mPoint123, mProgress)
 
         mLinearEquation0123.getCurPoint(mPoint0123, mProgress)
-
-//        mPath.reset()
-//        mPath.moveTo(mPoint0.x, mPoint0.y)
-//        mPath.lineTo(mPoint1.x, mPoint1.y)
-//        mPath.lineTo(mPoint2.x, mPoint2.y)
-//        mPath.lineTo(mPoint3.x, mPoint3.y)
-//
-//        mPath.moveTo(mPoint01.x, mPoint01.y)
-//        mPath.lineTo(mPoint12.x, mPoint12.y)
-//        mPath.lineTo(mPoint23.x, mPoint23.y)
-//
-//        mPath.moveTo(mPoint012.x, mPoint012.y)
-//        mPath.lineTo(mPoint123.x, mPoint123.y)
-//
-//        mPath.moveTo(mPoint0.x, mPoint0.y)
-//        mPath.cubicTo(mPoint01.x, mPoint01.y, mPoint012.x, mPoint012.y, mPoint0123.x, mPoint0123.y)
     }
 
     private fun updateLine() {
@@ -170,7 +182,12 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         if (canvas == null) return
-        canvas.translate(width / 2f, height / 2f)
+//        canvas.translate(width / 2f, height / 2f)
+
+        if (!isStartAnimator) {
+            drawPoint(canvas)
+            return
+        }
         drawLine(canvas)
         drawPoint(canvas)
     }
@@ -194,7 +211,7 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
         mLinePaint.strokeWidth = 8f
         mLinePaint.color = Color.RED
-        canvas.drawPath(mPathBezier,mLinePaint)
+        canvas.drawPath(mPathBezier, mLinePaint)
     }
 
     private fun drawPoint(canvas: Canvas) {
@@ -202,10 +219,10 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
         mPointPaint.strokeWidth = 4f
         mPointPaint.color = Color.BLACK
-        canvas.drawCircle(mPoint0.x, mPoint0.y,10f, mPointPaint)
-        canvas.drawCircle(mPoint1.x, mPoint1.y,10f, mPointPaint)
-        canvas.drawCircle(mPoint2.x, mPoint2.y,10f, mPointPaint)
-        canvas.drawCircle(mPoint3.x, mPoint3.y,10f, mPointPaint)
+        canvas.drawCircle(mPoint0.x, mPoint0.y, 10f, mPointPaint)
+        canvas.drawCircle(mPoint1.x, mPoint1.y, 10f, mPointPaint)
+        canvas.drawCircle(mPoint2.x, mPoint2.y, 10f, mPointPaint)
+        canvas.drawCircle(mPoint3.x, mPoint3.y, 10f, mPointPaint)
 
         mPointPaint.strokeWidth = 16f
         mPointPaint.color = Color.GREEN
@@ -219,5 +236,21 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
         mPointPaint.color = Color.BLACK
         canvas.drawPoint(mPoint0123.x, mPoint0123.y, mPointPaint)
+    }
+
+    fun startAnimator() {
+        isStartAnimator = true
+        bindLinear()
+        doDrawingAnimator()
+    }
+
+    fun reset() {
+        isStartAnimator = false
+        count = 0
+        mPoint0.set(0f, 0f)
+        mPoint1.set(0f, 0f)
+        mPoint2.set(0f, 0f)
+        mPoint3.set(0f, 0f)
+        invalidate()
     }
 }

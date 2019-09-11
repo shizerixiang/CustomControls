@@ -4,6 +4,8 @@ import android.os.Bundle
 import com.beviswang.customcontrols.BaseActivity
 import com.beviswang.customcontrols.R
 import com.beviswang.customcontrols.bindToolbar
+import kotlinx.android.synthetic.main.activity_bezier.*
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * 贝塞尔曲线演示
@@ -21,5 +23,7 @@ class BezierActivity : BaseActivity() {
 
     private fun bindData() {
         bindToolbar("贝塞尔曲线演示")
+        btn_bezier_start.onClick { bv_bezier.startAnimator() }
+        btn_bezier_reset.onClick { bv_bezier.reset() }
     }
 }
