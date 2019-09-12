@@ -217,6 +217,15 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
     private fun drawPoint(canvas: Canvas) {
         updatePoint()
 
+        mPointPaint.textSize = 40f
+        mPointPaint.strokeWidth = 1f
+        mPointPaint.style = Paint.Style.FILL_AND_STROKE
+        canvas.drawText("P0", mPoint0.x+20f, mPoint0.y-20f, mPointPaint)
+        canvas.drawText("P1", mPoint1.x+20f, mPoint1.y-20f, mPointPaint)
+        canvas.drawText("P2", mPoint2.x+20f, mPoint2.y-20f, mPointPaint)
+        canvas.drawText("P3", mPoint3.x+20f, mPoint3.y-20f, mPointPaint)
+
+        mPointPaint.style = Paint.Style.STROKE
         mPointPaint.strokeWidth = 4f
         mPointPaint.color = Color.BLACK
         canvas.drawCircle(mPoint0.x, mPoint0.y, 10f, mPointPaint)
@@ -224,6 +233,7 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         canvas.drawCircle(mPoint2.x, mPoint2.y, 10f, mPointPaint)
         canvas.drawCircle(mPoint3.x, mPoint3.y, 10f, mPointPaint)
 
+        if (!isStartAnimator) return
         mPointPaint.strokeWidth = 16f
         mPointPaint.color = Color.GREEN
         canvas.drawPoint(mPoint01.x, mPoint01.y, mPointPaint)
@@ -240,6 +250,7 @@ class BezierView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     fun startAnimator() {
         isStartAnimator = true
+        mProgress = 0f
         bindLinear()
         doDrawingAnimator()
     }

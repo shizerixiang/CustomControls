@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beviswang.customcontrols.BaseActivity
 import com.beviswang.customcontrols.R
+import com.beviswang.customcontrols.tansform.GlideRoundTransform
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.item_main.view.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -36,19 +38,19 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initData() {
-        mDataList = arrayOf(getDescModel("仿小米运动控件", "View 绘制", MiSportsViewActivity::class.java),
-                getDescModel("仿虾米 Tab 导航栏", "View 绘制 | 自定义控件 | 手势控制", XiamiMusicTabActivity::class.java),
-                getDescModel("可控饼状图", "View 绘制 | 手势控制", PieChartActivity::class.java),
-                getDescModel("仿红板报动画", "View 绘制", FlipBoardActivity::class.java),
-                getDescModel("飞行的火箭", "View 绘制", RocketFlyActivity::class.java),
-                getDescModel("混合图形画板", "View 绘制", MixedBoardActivity::class.java),
-                getDescModel("贝塞尔曲线演示", "View 绘制", BezierActivity::class.java))
+        mDataList = arrayOf(getDescModel("仿小米运动控件", "View 绘制 | 手势控制", MiSportsViewActivity::class.java, imgPath = R.mipmap.img_xiaomi_sport_header),
+                getDescModel("仿虾米 Tab 导航栏", "View 绘制 | 自定义控件 | 手势控制", XiamiMusicTabActivity::class.java, imgPath = R.mipmap.img_xiami_nav),
+                getDescModel("可控饼状图", "View 绘制 | 手势控制", PieChartActivity::class.java, imgPath = R.mipmap.img_pie_chart),
+                getDescModel("仿红板报动画", "View 绘制", FlipBoardActivity::class.java, imgPath = R.mipmap.img_flipboard),
+                getDescModel("飞行的火箭", "View 绘制", RocketFlyActivity::class.java, imgPath = R.mipmap.img_rocket_fly),
+                getDescModel("混合图形画板", "View 绘制", MixedBoardActivity::class.java, imgPath = R.mipmap.img_mixed_board),
+                getDescModel("贝塞尔曲线演示", "View 绘制", BezierActivity::class.java, imgPath = R.mipmap.img_bezier))
         mLayoutManager = LinearLayoutManager(baseContext, RecyclerView.VERTICAL, false)
         mAdapter = MainAdapter(baseContext, mDataList)
     }
 
-    private fun getDescModel(title: String, content: String, clazz: Class<*>, difficulty: String = "普通",
-                             type: String = "View") = ViewDescModel(title = title, content = content,
+    private fun getDescModel(title: String, content: String, clazz: Class<*>, difficulty: String = "Normal",
+                             type: String = "View", imgPath: Int = -1) = ViewDescModel(imgPath = imgPath, title = title, content = content,
             difficulty = difficulty, type = type, clazz = clazz)
 
     private fun bindViews() {
@@ -65,6 +67,8 @@ class MainActivity : BaseActivity() {
         @SuppressLint("SetTextI18n")
         override fun onBindViewHolder(holder: MainVH, position: Int) {
             val item = data[holder.adapterPosition]
+            if (item.imgPath != -1) Glide.with(context).asBitmap().load(item.imgPath).centerCrop()
+                    .transform(GlideRoundTransform(8)).into(holder.img)
             holder.title.text = item.title
             holder.content.text = item.content
             holder.label.text = "${item.difficulty} | ${item.type}"
@@ -79,6 +83,6 @@ class MainActivity : BaseActivity() {
         var label: TextView = itemView.tv_item_main_label
     }
 
-    class ViewDescModel(var imgPath: String = "", var title: String = "", var content: String = "",
+    class ViewDescModel(var imgPath: Int = -1, var title: String = "", var content: String = "",
                         var difficulty: String = "", var type: String = "", var clazz: Class<*>)
 }

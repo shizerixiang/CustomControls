@@ -8,4 +8,5 @@
     <color name="colorTitleText">#212121</color>
     <color name="colorDarkSubText">#454545</color>
     <color name="colorLightSubText">#999999</color>
+    <color name="colorPxLine">#CCCCCC</color>
 </resources>

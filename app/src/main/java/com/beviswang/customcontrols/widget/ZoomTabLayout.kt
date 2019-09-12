@@ -59,6 +59,7 @@ class ZoomTabLayout @JvmOverloads constructor(context: Context, attrs: Attribute
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         inflateItems()
+        invalidate()
     }
 
     /** 添加 Tab */
@@ -184,7 +185,7 @@ class ZoomTabLayout @JvmOverloads constructor(context: Context, attrs: Attribute
 
     /** @param index 选中的 item 的 index （注意：只有生成了视图才能调用） */
     fun selectItem(index: Int) {
-        mViewPager?.currentItem = index
+        mViewPager?.setCurrentItem(index, true)
     }
 
     /**

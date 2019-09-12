@@ -66,3 +66,8 @@ inline fun BaseActivity.bindToolbar(title: String, crossinline backListener: () 
     iv_tool_bar_back?.onClick { backListener() } // 返回
     tv_tool_bar_title?.text = title
 }
+
+/** 绑定 popupWindow */
+inline fun BaseActivity.bindPopupWindow(menuArray:Array<String>,clickListener:(Int,String)->Unit){
+
+}
