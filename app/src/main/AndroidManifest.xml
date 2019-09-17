@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.beviswang.customcontrols">
 
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,9 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoTitle"
         tools:ignore="GoogleAppIndexingWarning">
+
+        <activity android:name=".activity.SpectrumActivity"/>
         <!-- 贝塞尔曲线演示 -->
-        <activity android:name=".activity.BezierActivity" />
-        <!-- 混合图形 -->
+        <activity android:name=".activity.BezierActivity" /> <!-- 混合图形 -->
         <activity android:name=".activity.MixedBoardActivity" /> <!-- 飞行的火箭 -->
         <activity android:name=".activity.RocketFlyActivity" /> <!-- 仿红板报动画 -->
         <activity android:name=".activity.FlipBoardActivity" /> <!-- 原创可控饼状图 -->
