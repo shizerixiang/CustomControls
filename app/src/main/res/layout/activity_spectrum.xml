@@ -9,13 +9,22 @@
     <include layout="@layout/layout_tool_bar" />
 
     <com.beviswang.customcontrols.widget.SpectrumView
-        android:id="@+id/sv_spectrum"
+        android:id="@+id/sv_spectrum1"
         android:layout_width="match_parent"
         android:layout_height="240dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:background="@color/colorPrimaryDark"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cl_tool_bar" />
+
+    <com.beviswang.customcontrols.widget.SpectrumView
+        android:id="@+id/sv_spectrum2"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:background="@color/colorPrimaryDark"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sv_spectrum1" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_spectrum"
@@ -24,6 +33,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sv_spectrum" />
+        app:layout_constraintTop_toBottomOf="@+id/sv_spectrum2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

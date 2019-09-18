@@ -35,7 +35,7 @@ import java.io.IOException
  * @author BevisWang
  * @date 2019/9/17 15:16
  */
-class SpectrumActivity : BaseActivity(), MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
+class SpectrumActivity : BaseActivity(), MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener,Visualizer.OnDataCaptureListener {
     private var mMediaPlayer: MediaPlayer? = null
     private var mVisualizer: Visualizer? = null
     private var mDataList: ArrayList<MusicModel> = ArrayList()
@@ -73,7 +73,16 @@ class SpectrumActivity : BaseActivity(), MediaPlayer.OnCompletionListener, Media
     private fun initVisualizer() {
         mVisualizer = Visualizer(mMediaPlayer?.audioSessionId ?: return)
         mVisualizer?.captureSize = Visualizer.getCaptureSizeRange()[1]
-        mVisualizer?.setDataCaptureListener(sv_spectrum, Visualizer.getMaxCaptureRate() / 2, false, true)
+        sv_spectrum1.setSoftAnimator()
+        sv_spectrum2.setRushAnimator()
+        mVisualizer?.setDataCaptureListener(this, 6250, false, true)
+    }
+
+    override fun onWaveFormDataCapture(visualizer: Visualizer?, waveform: ByteArray?, samplingRate: Int) { }
+
+    override fun onFftDataCapture(visualizer: Visualizer?, fft: ByteArray?, samplingRate: Int) {
+        sv_spectrum1.onFftDataCapture(visualizer,fft,samplingRate)
+        sv_spectrum2.onFftDataCapture(visualizer,fft,samplingRate)
     }
 
     /** 初始化播放器 */

@@ -9,6 +9,7 @@ import android.media.audiofx.Visualizer
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import android.view.animation.LinearInterpolator
 
 /**
  * 音频频谱
@@ -35,6 +36,8 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     private var mAnimator: ValueAnimator? = null
     private var mProgress: Float = 0f
+
+    private var mIsRush: Boolean = false
 
     init {
         mBarPaint.style = Paint.Style.FILL_AND_STROKE
@@ -69,8 +72,8 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        mBarWidth = w / count.toFloat() / 2
-        mBarMaxHeight = h / 2
+        mBarWidth = w / count.toFloat()
+        mBarMaxHeight = h
         mBarPaint.strokeWidth = mBarWidth / 1.4f
     }
 
@@ -81,6 +84,14 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     override fun onWaveFormDataCapture(visualizer: Visualizer?, waveform: ByteArray?, samplingRate: Int) {}
 
+    fun setRushAnimator() {
+        mIsRush = true
+    }
+
+    fun setSoftAnimator() {
+        mIsRush = false
+    }
+
     /** 更新频谱 */
     private fun notifySpectrum(fft: ByteArray) {
         Log.e("notifySpectrum", "fftDataSize=${fft.size}")
@@ -89,8 +100,8 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
             mDivisor = fftLength / count / 4
             mAdjacentCount = mDivisor / 2
         }
-//        getCountValueRush(fft)
-        getCountValueSoft(fft)
+        if (mIsRush) getCountValueRush(fft)
+        else getCountValueSoft(fft)
         doAnimator()
     }
 
@@ -129,14 +140,14 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
                 return@addUpdateListener
             }
             // 主要动画结束，没有下一个任务直接返回起点，即：高度为 0
-            it.cancel()
-            mCurCountValue.forEachIndexed { i, v ->
+            mCountValue.forEachIndexed { i, v ->
                 mOldCountValue[i] = v
                 mCountValue[i] = 0f
             }
             doFinishAnimator()
         }
-        mAnimator?.duration = 180
+        mAnimator?.interpolator = LinearInterpolator()
+        mAnimator?.duration = 110
         mAnimator?.start()
     }
 
@@ -150,7 +161,8 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
             mProgress = it.animatedValue as Float
             invalidate()
         }
-        mAnimator?.duration = 180
+        mAnimator?.interpolator = LinearInterpolator()
+        mAnimator?.duration = 60
         mAnimator?.start()
     }
 
@@ -162,7 +174,7 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     private fun drawBar(canvas: Canvas) {
         canvas.save()
-        canvas.translate(width / 2f, height / 2f)
+        canvas.translate(0f, height / 2f)
         var x: Float
         var y: Float
         (0 until count).forEach {
@@ -171,8 +183,8 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
             mCurCountValue[it] = y
             canvas.drawLine(x, -2f, x, -y, mBarPaint)
             canvas.drawLine(x, 2f, x, y, mBarPaint)
-            canvas.drawLine(-x, -2f, -x, -y, mBarPaint)
-            canvas.drawLine(-x, 2f, -x, y, mBarPaint)
+//            canvas.drawLine(-x, -2f, -x, -y, mBarPaint)
+//            canvas.drawLine(-x, 2f, -x, y, mBarPaint)
         }
         canvas.restore()
     }
