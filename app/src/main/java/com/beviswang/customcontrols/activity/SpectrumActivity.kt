@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beviswang.customcontrols.BaseActivity
 import com.beviswang.customcontrols.R
+import com.beviswang.customcontrols.bindToolbar
 import com.beviswang.customcontrols.source.LocalMusicSource
 import com.beviswang.customcontrols.source.model.MusicModel
 import com.beviswang.customcontrols.source.utils.ConverterHelper
@@ -42,6 +43,7 @@ class SpectrumActivity : BaseActivity(), MediaPlayer.OnCompletionListener, Media
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_spectrum)
+        bindToolbar("频谱动画演示")
 
         requestSplashPermissions()
     }

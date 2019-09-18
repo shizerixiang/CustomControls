@@ -45,7 +45,7 @@ class MainActivity : BaseActivity() {
                 getDescModel("飞行的火箭", "View 绘制", RocketFlyActivity::class.java, imgPath = R.mipmap.img_rocket_fly),
                 getDescModel("混合图形画板", "View 绘制", MixedBoardActivity::class.java, imgPath = R.mipmap.img_mixed_board),
                 getDescModel("贝塞尔曲线演示", "View 绘制", BezierActivity::class.java, imgPath = R.mipmap.img_bezier),
-                getDescModel("音频频谱演示", "View 绘制", SpectrumActivity::class.java, imgPath = R.mipmap.img_bezier))
+                getDescModel("音频频谱演示", "View 绘制", SpectrumActivity::class.java, imgPath = R.mipmap.img_spectrum))
         mLayoutManager = LinearLayoutManager(baseContext, RecyclerView.VERTICAL, false)
         mAdapter = MainAdapter(baseContext, mDataList)
     }
