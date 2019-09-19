@@ -2,11 +2,14 @@ package com.beviswang.customcontrols.util
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.media.MediaMetadataRetriever
 import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.palette.graphics.Palette
 import com.beviswang.customcontrols.R
@@ -163,6 +166,14 @@ object BitmapHelper {
         })
     }
 
+    /** 获取 bitmap 图片的颜色 */
+    fun getPaletteColor(context: Context, bitmap: Bitmap, listener: (Int) -> Unit) {
+        Palette.from(bitmap).generate { palette ->
+            listener(palette?.vibrantSwatch?.rgb
+                    ?: ContextCompat.getColor(context, R.color.colorPrimary))
+        }
+    }
+
     /** 获取图片地址的图片的颜色和高斯模糊后的图片 */
     fun getGaussBitmap(context: Context, data: String, listener: (Bitmap) -> Unit) {
         Glide.with(context).asBitmap().load(data).dontAnimate().into(object : SimpleTarget<Bitmap>() {
@@ -179,5 +190,39 @@ object BitmapHelper {
                 listener(resource)
             }
         })
+    }
+
+    /**
+     * 从媒体文件中提取bitmap
+
+     * @param musicUrl 媒体文件地址
+     * *
+     * @return bitmap
+     */
+    fun getBitmapFromMedia(musicUrl: String, size: Int = 1080): Bitmap? {
+        var bitmap: Bitmap? = null
+        val metadataRetriever = MediaMetadataRetriever()
+        try {
+            metadataRetriever.setDataSource(musicUrl)
+            val artwork = metadataRetriever.embeddedPicture
+            if (artwork != null) {
+                val options = BitmapFactory.Options()
+                options.inJustDecodeBounds = true
+                bitmap = BitmapFactory.decodeByteArray(artwork, 0, artwork.size, options)
+                options.inJustDecodeBounds = false
+                options.inPreferredConfig = Bitmap.Config.RGB_565
+                if (options.outHeight > size) {
+                    options.inSampleSize = options.outHeight / size
+                }
+                bitmap = BitmapFactory.decodeByteArray(artwork, 0, artwork.size, options)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            metadataRetriever.release()
+        }
+        if (bitmap != null)
+            Log.i("getBitmapFromMedia", "找到了" + musicUrl + "的歌曲图片!")
+        return bitmap
     }
 }

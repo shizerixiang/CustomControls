@@ -1,4 +1,4 @@
-package com.bevis.bevisui.util
+package com.beviswang.customcontrols.util
 
 import android.content.Context
 import android.view.GestureDetector

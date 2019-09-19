@@ -1,4 +1,4 @@
-package com.beviswang.customcontrols.widget
+package com.beviswang.customcontrols.widget.spectrum
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -20,24 +20,26 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
     : View(context, attrs, def), Visualizer.OnDataCaptureListener {
     private val mDefWidth: Int = 300
     private val mDefHeight: Int = 300
-    private val mBarPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var count: Int                                                   // 需要取点的数量
-    private var mCountValue: FloatArray
     private var mDivisor: Int
     private var mAdjacentCount: Int
     private var mMinIndex = 0
     private var mMaxIndex = 0
     private var mCurValue = 0f
-    private var mBarWidth = 0f
     private var mBarMaxHeight = 0
     private var fftLength = 128
+    private var mNewCountValue: FloatArray
     private var mOldCountValue: FloatArray
     private var mCurCountValue: FloatArray
+    private var mBarWidth = 0f
+    private val mBarPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private var mAnimator: ValueAnimator? = null
     private var mProgress: Float = 0f
 
     private var mIsRush: Boolean = false
+
+    private var mIsDetached: Boolean = false
 
     init {
         mBarPaint.style = Paint.Style.FILL_AND_STROKE
@@ -46,8 +48,8 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
         mBarPaint.color = Color.WHITE
 
         // 设置点数量
-        count = 128
-        mCountValue = FloatArray(count)
+        count = 32
+        mNewCountValue = FloatArray(count)
         mOldCountValue = FloatArray(count)
         mCurCountValue = FloatArray(count)
         mDivisor = fftLength / count
@@ -72,13 +74,13 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        mBarWidth = w / count.toFloat()
-        mBarMaxHeight = h
+        mBarWidth = w / count.toFloat() / 2
+        mBarMaxHeight = h / 2
         mBarPaint.strokeWidth = mBarWidth / 1.4f
     }
 
     override fun onFftDataCapture(visualizer: Visualizer?, fft: ByteArray?, samplingRate: Int) {
-        if (fft == null) return
+        if (fft == null || mIsDetached) return
         notifySpectrum(fft)
     }
 
@@ -90,6 +92,14 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     fun setSoftAnimator() {
         mIsRush = false
+    }
+
+    fun pause() {
+        mIsDetached = true
+    }
+
+    fun resume() {
+        mIsDetached = false
     }
 
     /** 更新频谱 */
@@ -114,16 +124,16 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
             mMaxIndex = i * mDivisor + mAdjacentCount
             if (mMaxIndex > fftLength) mMaxIndex = fftLength
             (mMinIndex until mMaxIndex).forEach { j -> mCurValue += Math.hypot(fft[j * 2].toDouble(), fft[j * 2 + 1].toDouble()).toFloat() }
-            mOldCountValue[i] = mCountValue[i]  // 记录上次的值
-            mCountValue[i] = (mCurValue / (mMaxIndex - mMinIndex)) / 96f * mBarMaxHeight
+            mOldCountValue[i] = mNewCountValue[i]  // 记录上次的值
+            mNewCountValue[i] = (mCurValue / (mMaxIndex - mMinIndex)) / 96f * mBarMaxHeight
         }
     }
 
     /** 湍急算法 */
     private fun getCountValueRush(fft: ByteArray) {
-        mCountValue[0] = Math.abs(fft[0].toInt()) / 128f * mBarMaxHeight
+        mNewCountValue[0] = Math.abs(fft[0].toInt()) / 128f * mBarMaxHeight
         (1 until count).forEach { i ->
-            mCountValue[i] = Math.hypot(fft[i * mDivisor].toDouble(), fft[i * mDivisor + 1].toDouble()).toFloat() / 128f * mBarMaxHeight
+            mNewCountValue[i] = Math.hypot(fft[i * mDivisor].toDouble(), fft[i * mDivisor + 1].toDouble()).toFloat() / 128f * mBarMaxHeight
         }
     }
 
@@ -134,15 +144,16 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
         mAnimator?.cancel()
         mAnimator = ValueAnimator.ofFloat(0f, 1f)
         mAnimator?.addUpdateListener {
+            if (mIsDetached) return@addUpdateListener
             mProgress = it.animatedValue as Float
             if (mProgress < 1f) {
                 invalidate()
                 return@addUpdateListener
             }
             // 主要动画结束，没有下一个任务直接返回起点，即：高度为 0
-            mCountValue.forEachIndexed { i, v ->
+            mNewCountValue.forEachIndexed { i, v ->
                 mOldCountValue[i] = v
-                mCountValue[i] = 0f
+                mNewCountValue[i] = 0f
             }
             doFinishAnimator()
         }
@@ -158,6 +169,7 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
         mAnimator?.cancel()
         mAnimator = ValueAnimator.ofFloat(0f, 1f)
         mAnimator?.addUpdateListener {
+            if (mIsDetached) return@addUpdateListener
             mProgress = it.animatedValue as Float
             invalidate()
         }
@@ -172,20 +184,33 @@ class SpectrumView @JvmOverloads constructor(context: Context, attrs: AttributeS
         drawBar(canvas)
     }
 
+    private var disX: Float = 0f
+    private var disY: Float = 2f
+
     private fun drawBar(canvas: Canvas) {
         canvas.save()
-        canvas.translate(0f, height / 2f)
-        var x: Float
-        var y: Float
+        canvas.translate(width / 2f, height / 2f)
+        disY = mBarPaint.strokeWidth / 2f
         (0 until count).forEach {
-            x = it * mBarWidth + (mBarPaint.strokeWidth / 2) + 1
-            y = (mCountValue[it] - mOldCountValue[it]) * mProgress + mOldCountValue[it]
-            mCurCountValue[it] = y
-            canvas.drawLine(x, -2f, x, -y, mBarPaint)
-            canvas.drawLine(x, 2f, x, y, mBarPaint)
-//            canvas.drawLine(-x, -2f, -x, -y, mBarPaint)
-//            canvas.drawLine(-x, 2f, -x, y, mBarPaint)
+            disX = it * mBarWidth + (mBarPaint.strokeWidth * 0.75f)
+            mCurCountValue[it] = (mNewCountValue[it] - mOldCountValue[it]) * mProgress + mOldCountValue[it]
+            mBarPaint.alpha = 255
+            canvas.drawLine(disX, -disY, disX, -mCurCountValue[it] - disY-1, mBarPaint)
+            canvas.drawLine(-disX, -disY, -disX, -mCurCountValue[it] - disY-1, mBarPaint)
+            mBarPaint.alpha = 180
+            canvas.drawLine(disX, disY, disX, mCurCountValue[it] + disY+1, mBarPaint)
+            canvas.drawLine(-disX, disY, -disX, mCurCountValue[it] + disY+1, mBarPaint)
         }
         canvas.restore()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        mIsDetached = true
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        mIsDetached = false
     }
 }

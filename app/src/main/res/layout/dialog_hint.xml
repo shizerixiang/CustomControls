@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_hint_dialog">
+
+        <TextView
+            android:id="@+id/tv_dialog_hint_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxWidth="300dp"
+            android:maxLines="1"
+            android:minWidth="240dp"
+            android:text="提示"
+            android:textColor="@color/colorTitleText"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_dialog_hint_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:maxWidth="300dp"
+            android:maxLines="6"
+            android:minWidth="240dp"
+            android:text="这是一个提示哦！"
+            android:textColor="@color/colorDarkSubText"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_dialog_hint_title" />
+
+        <View
+            android:id="@+id/v_dialog_hint_line"
+            android:layout_width="0dp"
+            android:layout_height="1px"
+            android:layout_marginTop="30dp"
+            android:background="@color/colorPrimary"
+            android:alpha="0.4"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_dialog_hint_content" />
+
+        <TextView
+            android:id="@+id/tv_dialog_hint_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:minWidth="280dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:text="取消"
+            android:textColor="@color/colorTitleText"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/tv_dialog_hint_setting"
+            app:layout_constraintTop_toBottomOf="@+id/v_dialog_hint_line" />
+
+        <TextView
+            android:id="@+id/tv_dialog_hint_setting"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:minWidth="280dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:text="关闭"
+            android:textColor="@color/colorTitleText"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/tv_dialog_hint_cancel"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/v_dialog_hint_line" />
+
+        <View
+            android:layout_width="1px"
+            android:layout_height="0dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:alpha="0.4"
+            android:background="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_dialog_hint_cancel"
+            app:layout_constraintRight_toRightOf="@+id/tv_dialog_hint_cancel"
+            app:layout_constraintTop_toTopOf="@+id/tv_dialog_hint_cancel" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

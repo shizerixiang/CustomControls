@@ -2,6 +2,7 @@ package com.beviswang.customcontrols
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.layout_tool_bar.*
 import org.jetbrains.anko.imageResource
@@ -68,6 +69,18 @@ inline fun BaseActivity.bindToolbar(title: String, crossinline backListener: () 
 }
 
 /** 绑定 popupWindow */
-inline fun BaseActivity.bindPopupWindow(menuArray:Array<String>,clickListener:(Int,String)->Unit){
+inline fun BaseActivity.bindPopupWindow(menuArray: Array<String>, clickListener: (Int, String) -> Unit) {
 
+}
+
+fun loge(str: String?) {
+    Log.e("CustomControls", str ?: "null")
+}
+
+fun logd(str: String?) {
+    Log.d("CustomControls", str ?: "null")
+}
+
+fun logi(str: String?) {
+    Log.i("CustomControls", str ?: "null")
 }

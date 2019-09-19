@@ -95,7 +95,8 @@ object PointHelper {
      */
     fun getPointByDistance(sp: PointF, k: Float, m: Float, distance: Float, isXIncreasingDir: Boolean): PointF {
         val absX = distance / Math.sqrt(1 + Math.pow(k.toDouble(), 2.0)).toFloat() + sp.x
-        val tx = if (if (isXIncreasingDir) sp.y < 0 else sp.y > 0) absX else getMirrorValue(sp.x, absX)
+//        val tx = if (if (isXIncreasingDir) sp.y < 0 else sp.y > 0) absX else getMirrorValue(sp.x, absX)
+        val tx = if (isXIncreasingDir) absX else getMirrorValue(sp.x, absX)
         val ty = k * tx + m
         return PointF(tx, ty)
     }

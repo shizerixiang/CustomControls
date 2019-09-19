@@ -2,6 +2,7 @@ package com.beviswang.customcontrols.graphics.equation
 
 import android.graphics.Path
 import android.graphics.PointF
+import com.beviswang.customcontrols.graphics.PointHelper
 
 /**
  * 动态直线方程（动态根据现在的点进行方程更新，比较吃性能）
@@ -57,5 +58,11 @@ class LinearDynamicEquation private constructor() : IEquation {
         path.reset()
         path.moveTo(p1.x, p1.y)
         path.lineTo(p2.x, p2.y)
+    }
+
+    /** 获取 p1 到 p2 方向的延长 distance 距离的点 */
+    fun getP1ToP2DistancePoint(distance: Float): PointF {
+        update()
+        return PointHelper.getPointByDistance(p2, k, b, distance, p2.x > p1.x)
     }
 }

@@ -3,49 +3,57 @@ package com.beviswang.customcontrols.activity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.media.AudioManager
-import android.media.MediaPlayer
-import android.media.audiofx.Visualizer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beviswang.customcontrols.BaseActivity
 import com.beviswang.customcontrols.R
 import com.beviswang.customcontrols.bindToolbar
+import com.beviswang.customcontrols.dialog.HintDialog
+import com.beviswang.customcontrols.media.SimpleMediaPlayer
 import com.beviswang.customcontrols.source.LocalMusicSource
 import com.beviswang.customcontrols.source.model.MusicModel
 import com.beviswang.customcontrols.source.utils.ConverterHelper
 import com.beviswang.customcontrols.source.utils.ConverterHelper.ACCURATE_TO_MINUTE
 import com.beviswang.customcontrols.tansform.GlideRoundTransform
+import com.beviswang.customcontrols.util.BitmapHelper
+import com.beviswang.customcontrols.util.TransitionHelper
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_spectrum.*
 import kotlinx.android.synthetic.main.item_main.view.*
+import kotlinx.android.synthetic.main.layout_tool_bar.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.uiThread
-import java.io.IOException
 
 /**
  * 频谱动画演示
  * @author BevisWang
  * @date 2019/9/17 15:16
  */
-class SpectrumActivity : BaseActivity(), MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener,Visualizer.OnDataCaptureListener {
-    private var mMediaPlayer: MediaPlayer? = null
-    private var mVisualizer: Visualizer? = null
+class SpectrumActivity : BaseActivity() {
+    private var mMediaPlayer: SimpleMediaPlayer? = null
     private var mDataList: ArrayList<MusicModel> = ArrayList()
+
+    private var mTbColor: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_spectrum)
-        bindToolbar("频谱动画演示")
+        bindToolbar("频谱动画演示", menuVisibility = View.VISIBLE, menuListener = { showHintDialog() })
 
         requestSplashPermissions()
+        mTbColor = ContextCompat.getColor(this@SpectrumActivity, R.color.colorPrimary)
+    }
+
+    private fun showHintDialog() {
+        HintDialog.Builder(this@SpectrumActivity).show()
     }
 
     private fun requestSplashPermissions() = requestGPHPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -65,77 +73,34 @@ class SpectrumActivity : BaseActivity(), MediaPlayer.OnCompletionListener, Media
     }
 
     private fun bindData() {
-        initMediaPlayer()
-        initVisualizer()
+        sv_spectrum1.setRushAnimator()
+        sv_spectrum2.setSoftAnimator()
+        mMediaPlayer = SimpleMediaPlayer()
+        mMediaPlayer?.openVisualizer()
+        mMediaPlayer?.addOnPlayChanged { changeScene(it) }
+        mMediaPlayer?.addFftListener { v, fft, i ->
+            sv_spectrum1.onFftDataCapture(v,fft,i)
+            sv_spectrum2.onFftDataCapture(v,fft,i)
+        }
         initMusicList()
     }
 
-    private fun initVisualizer() {
-        mVisualizer = Visualizer(mMediaPlayer?.audioSessionId ?: return)
-        mVisualizer?.captureSize = Visualizer.getCaptureSizeRange()[1]
-        sv_spectrum1.setSoftAnimator()
-        sv_spectrum2.setRushAnimator()
-        mVisualizer?.setDataCaptureListener(this, 6250, false, true)
-    }
-
-    override fun onWaveFormDataCapture(visualizer: Visualizer?, waveform: ByteArray?, samplingRate: Int) { }
-
-    override fun onFftDataCapture(visualizer: Visualizer?, fft: ByteArray?, samplingRate: Int) {
-        sv_spectrum1.onFftDataCapture(visualizer,fft,samplingRate)
-        sv_spectrum2.onFftDataCapture(visualizer,fft,samplingRate)
-    }
-
-    /** 初始化播放器 */
-    private fun initMediaPlayer() {
-        mMediaPlayer?.reset()
-        mMediaPlayer = MediaPlayer()
-        mMediaPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC) // 音频流类型
-        mMediaPlayer?.setVolume(1.0f, 1.0f) // 左右音频播放音量
-        mMediaPlayer?.setOnCompletionListener(this)
-        mMediaPlayer?.setOnErrorListener(this)
-    }
-
-    override fun onCompletion(mp: MediaPlayer?) {
-        showMsg("播放结束")
-        mVisualizer?.enabled = false
-    }
-
-    override fun onError(mp: MediaPlayer?, what: Int, extra: Int): Boolean {
-        showMsg("播放错误：errorType=$what   errorCode=$extra")
-        mVisualizer?.enabled = false
-        return true
-    }
-
-    private fun playMusic(url: String) {
-        if (mMediaPlayer == null || url.isEmpty()) return
-        try {
-            mVisualizer?.enabled = false
-            mMediaPlayer?.reset()
-            mMediaPlayer?.setDataSource(url)
-            mMediaPlayer?.prepare()
-            mMediaPlayer?.start()
-            mVisualizer?.enabled = true
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun stopMusic() {
-        if (mMediaPlayer == null) return
-        try {
-            mVisualizer?.enabled = false
-            mMediaPlayer?.pause()
-            mMediaPlayer?.release()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    private fun changeScene(m: MusicModel) {
+        val url = m.url
+        tv_tool_bar_title.text = m.title
+        val bt = BitmapHelper.getBitmapFromMedia(url) ?: return
+        Glide.with(baseContext).asBitmap().load(bt).centerCrop().into(iv_spectrum_bg)
+        BitmapHelper.getPaletteColor(this@SpectrumActivity, bt, listener = { color ->
+            TransitionHelper.changeBgColorAnimator(mTbColor, color, cl_tool_bar)
+            mTbColor = color
+        })
     }
 
     /** 初始化音乐文件列表 */
     private fun initMusicList() {
         rv_spectrum.layoutManager = LinearLayoutManager(baseContext, RecyclerView.VERTICAL, false)
         val adapter = MusicAdapter(baseContext, mDataList)
-        adapter.setPlayListener { playMusic(it) }
+        adapter.setPlayListener { mMediaPlayer?.play(it) }
         rv_spectrum.adapter = adapter
         doAsync {
             LocalMusicSource(this@SpectrumActivity).iterators()?.forEach { mDataList.add(it) }
@@ -143,13 +108,25 @@ class SpectrumActivity : BaseActivity(), MediaPlayer.OnCompletionListener, Media
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        sv_spectrum1.resume()
+        sv_spectrum2.resume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sv_spectrum1.pause()
+        sv_spectrum2.pause()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        stopMusic()
+        mMediaPlayer?.stop()
     }
 
     class MusicAdapter(private var context: Context, private var data: List<MusicModel>) : RecyclerView.Adapter<MusicVH>() {
-        private var mPlayListener: (String) -> Unit = {}
+        private var mPlayListener: (MusicModel) -> Unit = {}
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicVH = MusicVH(LayoutInflater.from(context)
                 .inflate(R.layout.item_main, parent, false))
@@ -159,15 +136,15 @@ class SpectrumActivity : BaseActivity(), MediaPlayer.OnCompletionListener, Media
         @SuppressLint("SetTextI18n")
         override fun onBindViewHolder(holder: MusicVH, position: Int) {
             val item = data[holder.adapterPosition]
-            Glide.with(context).asBitmap().load(item.imageUrl).centerCrop()
+            Glide.with(context).asBitmap().load(BitmapHelper.getBitmapFromMedia(item.url, 280)).centerCrop()
                     .transform(GlideRoundTransform(8)).into(holder.img)
             holder.title.text = item.title
             holder.content.text = item.artist
             holder.label.text = ConverterHelper.getConvertedTime(item.duration, ACCURATE_TO_MINUTE)
-            holder.itemView.onClick { mPlayListener(item.url) }
+            holder.itemView.onClick { mPlayListener(item) }
         }
 
-        fun setPlayListener(listener: (String) -> Unit) {
+        fun setPlayListener(listener: (MusicModel) -> Unit) {
             mPlayListener = listener
         }
     }
