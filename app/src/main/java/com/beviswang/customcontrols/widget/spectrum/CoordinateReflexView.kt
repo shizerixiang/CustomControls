@@ -23,6 +23,8 @@ class CoordinateReflexView @JvmOverloads constructor(context: Context, attrs: At
         mBarPaint.strokeWidth = 12f
         mBarPaint.strokeCap = Paint.Cap.ROUND
         mBarPaint.color = Color.WHITE
+
+        setPointCount(32)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {

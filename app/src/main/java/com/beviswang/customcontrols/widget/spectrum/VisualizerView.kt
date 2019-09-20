@@ -12,22 +12,22 @@ open class VisualizerView @JvmOverloads constructor(context: Context, attrs: Att
     : View(context, attrs, def), Visualizer.OnDataCaptureListener {
     private val mDefWidth: Int = 300
     private val mDefHeight: Int = 300
-    protected var count: Int                                                   // 需要取点的数量
+    protected var count: Int                            // 需要取点的数量
     private var mDivisor: Int = 0
     private var mAdjacentCount: Int = 0
     private var mMinIndex = 0
     private var mMaxIndex = 0
     private var mCurValue = 0f
     private var fftLength = 128
-    private var mBarMaxHeight = 0
-    protected lateinit var mNewCountValue: FloatArray
-    protected lateinit var mOldCountValue: FloatArray
-    protected lateinit var mCurCountValue: FloatArray
+    private var mBarMaxHeight = 0                       // 每个点的最大值
+    protected lateinit var mNewCountValue: FloatArray   // 新数据
+    protected lateinit var mOldCountValue: FloatArray   // 旧数据
+    protected lateinit var mCurCountValue: FloatArray   // 当前绘制的数据（动画变化的值）
 
-    private var mAnimator: ValueAnimator? = null
-    private var mProgress: Float = 0f
+    private var mAnimator: ValueAnimator? = null        // 执行的动画
+    private var mProgress: Float = 0f                   // 动画进度
 
-    private var mIsRush: Boolean = false
+    private var mIsRush: Boolean = false                // 处理数据的模式，是否为湍急模式（未处理的数据，反之为处理后 - 平均化 - 的数据）
 
     private var mIsDetached: Boolean = false
 
@@ -148,7 +148,7 @@ open class VisualizerView @JvmOverloads constructor(context: Context, attrs: Att
             doFinishAnimator()
         }
         mAnimator?.interpolator = LinearInterpolator()
-        mAnimator?.duration = 110
+        mAnimator?.duration = 80
         mAnimator?.start()
     }
 

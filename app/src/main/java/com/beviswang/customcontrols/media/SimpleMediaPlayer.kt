@@ -42,7 +42,11 @@ class SimpleMediaPlayer(var mPlayList: ArrayList<MusicModel> = ArrayList())
         if (!mIsOpenVisualizer) return
         mVisualizer = Visualizer(mMediaPlayer?.audioSessionId ?: return)
         mVisualizer?.captureSize = Visualizer.getCaptureSizeRange()[1]
-        mVisualizer?.setDataCaptureListener(this, 6250, false, true)
+        mVisualizer?.setDataCaptureListener(this, getMs2MHz(80), false, true)
+    }
+
+    private fun getMs2MHz(ms: Int): Int {
+        return 1000000 / ms
     }
 
     override fun onWaveFormDataCapture(visualizer: Visualizer?, waveform: ByteArray?, samplingRate: Int) {

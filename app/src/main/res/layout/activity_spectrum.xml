@@ -11,31 +11,23 @@
     <ImageView
         android:id="@+id/iv_spectrum_bg"
         android:layout_width="0dp"
-        app:layout_constraintRight_toRightOf="@+id/sv_spectrum1"
-        app:layout_constraintTop_toTopOf="@+id/sv_spectrum1"
+        android:layout_height="360dp"
         android:background="@color/colorPrimary"
         android:contentDescription="@string/app_name"
-        app:layout_constraintBottom_toBottomOf="@+id/sv_spectrum2"
+        android:scaleType="centerCrop"
         app:layout_constraintLeft_toLeftOf="@+id/sv_spectrum1"
-        android:layout_height="0dp" />
+        app:layout_constraintRight_toRightOf="@+id/sv_spectrum1"
+        app:layout_constraintTop_toTopOf="@+id/sv_spectrum1" />
 
-    <com.beviswang.customcontrols.widget.spectrum.SpectrumCircleView
+    <com.beviswang.customcontrols.widget.spectrum.CoordinateReflexView
         android:id="@+id/sv_spectrum1"
         android:layout_width="match_parent"
-        android:layout_height="160dp"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_height="0dp"
         android:background="#33333333"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_spectrum_bg"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cl_tool_bar" />
-
-    <com.beviswang.customcontrols.widget.spectrum.SpectrumCircleView
-        android:id="@+id/sv_spectrum2"
-        android:layout_width="match_parent"
-        android:layout_height="160dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:background="#33333333"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sv_spectrum1" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_spectrum"
@@ -44,6 +36,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sv_spectrum2" />
+        app:layout_constraintTop_toBottomOf="@+id/iv_spectrum_bg" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

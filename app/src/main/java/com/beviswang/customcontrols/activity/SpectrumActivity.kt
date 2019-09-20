@@ -3,6 +3,8 @@ package com.beviswang.customcontrols.activity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,6 +27,10 @@ import com.beviswang.customcontrols.tansform.GlideRoundTransform
 import com.beviswang.customcontrols.util.BitmapHelper
 import com.beviswang.customcontrols.util.TransitionHelper
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
+import com.bumptech.glide.request.transition.DrawableCrossFadeTransition
 import kotlinx.android.synthetic.main.activity_spectrum.*
 import kotlinx.android.synthetic.main.item_main.view.*
 import kotlinx.android.synthetic.main.layout_tool_bar.*
@@ -42,6 +48,7 @@ class SpectrumActivity : BaseActivity() {
     private var mDataList: ArrayList<MusicModel> = ArrayList()
 
     private var mTbColor: Int = 0
+    private var mLastBitmap: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,13 +81,13 @@ class SpectrumActivity : BaseActivity() {
 
     private fun bindData() {
         sv_spectrum1.setRushAnimator()
-        sv_spectrum2.setSoftAnimator()
+//        sv_spectrum2.setSoftAnimator()
         mMediaPlayer = SimpleMediaPlayer()
         mMediaPlayer?.openVisualizer()
         mMediaPlayer?.addOnPlayChanged { changeScene(it) }
         mMediaPlayer?.addFftListener { v, fft, i ->
-            sv_spectrum1.onFftDataCapture(v,fft,i)
-            sv_spectrum2.onFftDataCapture(v,fft,i)
+            sv_spectrum1.onFftDataCapture(v, fft, i)
+//            sv_spectrum2.onFftDataCapture(v,fft,i)
         }
         initMusicList()
     }
@@ -89,11 +96,15 @@ class SpectrumActivity : BaseActivity() {
         val url = m.url
         tv_tool_bar_title.text = m.title
         val bt = BitmapHelper.getBitmapFromMedia(url) ?: return
-        Glide.with(baseContext).asBitmap().load(bt).centerCrop().into(iv_spectrum_bg)
+        Glide.with(baseContext).asBitmap().load(bt)
+                .placeholder(BitmapDrawable(resources, mLastBitmap))
+                .transition(BitmapTransitionOptions.withCrossFade())
+                .centerCrop().into(iv_spectrum_bg)
         BitmapHelper.getPaletteColor(this@SpectrumActivity, bt, listener = { color ->
             TransitionHelper.changeBgColorAnimator(mTbColor, color, cl_tool_bar)
             mTbColor = color
         })
+        mLastBitmap = bt
     }
 
     /** 初始化音乐文件列表 */
@@ -111,13 +122,13 @@ class SpectrumActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         sv_spectrum1.resume()
-        sv_spectrum2.resume()
+//        sv_spectrum2.resume()
     }
 
     override fun onPause() {
         super.onPause()
         sv_spectrum1.pause()
-        sv_spectrum2.pause()
+//        sv_spectrum2.pause()
     }
 
     override fun onDestroy() {
@@ -137,6 +148,7 @@ class SpectrumActivity : BaseActivity() {
         override fun onBindViewHolder(holder: MusicVH, position: Int) {
             val item = data[holder.adapterPosition]
             Glide.with(context).asBitmap().load(BitmapHelper.getBitmapFromMedia(item.url, 280)).centerCrop()
+                    .transition(BitmapTransitionOptions.withCrossFade())
                     .transform(GlideRoundTransform(8)).into(holder.img)
             holder.title.text = item.title
             holder.content.text = item.artist
