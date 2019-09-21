@@ -19,7 +19,7 @@
         app:layout_constraintRight_toRightOf="@+id/sv_spectrum1"
         app:layout_constraintTop_toTopOf="@+id/sv_spectrum1" />
 
-    <com.beviswang.customcontrols.widget.spectrum.CoordinateReflexView
+    <com.beviswang.customcontrols.widget.spectrum.CircleSpectrumView
         android:id="@+id/sv_spectrum1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -28,6 +28,15 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cl_tool_bar" />
+
+    <SeekBar
+        android:id="@+id/sb_spectrum"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="1000"
+        app:layout_constraintBottom_toTopOf="@+id/rv_spectrum"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_spectrum"

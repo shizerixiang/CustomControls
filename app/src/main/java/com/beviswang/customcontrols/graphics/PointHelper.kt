@@ -117,4 +117,20 @@ object PointHelper {
      */
     fun getMirrorPoint(normalLineP: PointF, sp: PointF) = PointF(getMirrorValue(
             normalLineP.x, sp.x), getMirrorValue(normalLineP.y, sp.y))
+
+    /**
+     * 获取点的角度 （点与原点的连线相对于 X 轴正方向的夹角）
+     * @param o 原点在控件中的坐标
+     * @param p 点击的点
+     * @param rotate 旋转角度，默认不旋转
+     * @return 角度 [0 - 359]
+     */
+    fun getPointDegree(o: PointF, p: PointF, rotate: Float = 0f): Float {
+        val arc = Math.atan2(((p.y - o.y).toDouble()), (p.x - o.x).toDouble())
+        var degree = (arc * (180 / Math.PI)).toFloat()
+        degree += if (degree < 0) 360 + rotate else rotate
+        if (degree > 360) degree -= 360
+        if (degree < 0) degree += 360
+        return degree
+    }
 }

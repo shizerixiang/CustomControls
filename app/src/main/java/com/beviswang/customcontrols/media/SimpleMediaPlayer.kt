@@ -3,6 +3,9 @@ package com.beviswang.customcontrols.media
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.audiofx.Visualizer
+import android.os.Handler
+import android.os.Message
+import android.widget.SeekBar
 import com.beviswang.customcontrols.loge
 import com.beviswang.customcontrols.logi
 import com.beviswang.customcontrols.source.model.MusicModel
@@ -14,7 +17,8 @@ import java.io.IOException
  * @date 2019/9/19 14:58
  */
 class SimpleMediaPlayer(var mPlayList: ArrayList<MusicModel> = ArrayList())
-    : MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, Visualizer.OnDataCaptureListener {
+    : MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, Visualizer.OnDataCaptureListener,
+        SeekBar.OnSeekBarChangeListener {
     private var mLoopModel: Int = LOOP_MODEL_LOOP_LIST
     private var mMediaPlayer: MediaPlayer? = null
     private var mVisualizer: Visualizer? = null
@@ -23,10 +27,14 @@ class SimpleMediaPlayer(var mPlayList: ArrayList<MusicModel> = ArrayList())
     private var mFftListener: (Visualizer?, ByteArray?, Int) -> Unit = { _, _, _ -> }
     private var mWaveListener: (Visualizer?, ByteArray?, Int) -> Unit = { _, _, _ -> }
     private var mCurIndex: Int = 0
+    private var mSeekHandler: TimeSeekHandler = TimeSeekHandler(this)
+    private var mSeekListener: (Float) -> Unit = {} // 播放进度监控
+    private var mIsSeek: Boolean = false // 是否正在拖动进度条
 
     init {
         initMediaPlayer()
         initVisualizer()
+        mSeekHandler.sendEmptyMessageDelayed(HANDLER_SEEK_TIME, 1000)
     }
 
     private fun initMediaPlayer() {
@@ -72,6 +80,20 @@ class SimpleMediaPlayer(var mPlayList: ArrayList<MusicModel> = ArrayList())
         return true
     }
 
+    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+
+    }
+
+    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+        mIsSeek = true
+    }
+
+    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+        mIsSeek = false
+        if (seekBar == null) return
+        seekTo(seekBar.progress.toFloat() / seekBar.max)
+    }
+
     fun play(musicModel: MusicModel) {
         if (mPlayList.contains(musicModel)) {
             mCurIndex = mPlayList.indexOf(musicModel)
@@ -107,8 +129,15 @@ class SimpleMediaPlayer(var mPlayList: ArrayList<MusicModel> = ArrayList())
     }
 
     /** 跳转到歌曲的指定时间 */
-    fun seekTo(pos: Long) {
-        mMediaPlayer?.seekTo(pos.toInt())
+    fun seekTo(pos: Int) {
+        mMediaPlayer?.seekTo(pos)
+    }
+
+    /** 跳转到歌曲的指定进度 */
+    fun seekTo(progress: Float) {
+        val d = mMediaPlayer?.duration ?: -1
+        if (d < 1) return
+        mMediaPlayer?.seekTo((d * progress).toInt())
     }
 
     /** 播放上一首歌曲 */
@@ -182,9 +211,39 @@ class SimpleMediaPlayer(var mPlayList: ArrayList<MusicModel> = ArrayList())
         mPlayListener = listener
     }
 
+    /** 进度监听 */
+    fun addSeekListener(listener: (Float) -> Unit) {
+        mSeekListener = listener
+    }
+
+    /** 播放进度监控 */
+    class TimeSeekHandler(private val simpleMediaPlayer: SimpleMediaPlayer) : Handler() {
+
+        override fun handleMessage(msg: Message?) {
+            when (msg?.what) {
+                HANDLER_SEEK_TIME -> {
+                    sendEmptyMessageDelayed(HANDLER_SEEK_TIME, 1000)
+                    var duration: Float = 0f
+                    var cur: Int = 0
+                    try {
+                        if (simpleMediaPlayer.mMediaPlayer?.isPlaying != true) return // 是否在播放
+                        if (simpleMediaPlayer.mIsSeek) return // 正在拖动，不回调更新
+                        duration = simpleMediaPlayer.mMediaPlayer!!.duration.toFloat()
+                        cur = simpleMediaPlayer.mMediaPlayer!!.currentPosition
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    simpleMediaPlayer.mSeekListener(cur / duration)
+                }
+            }
+        }
+    }
+
     companion object {
         const val LOOP_MODEL_LOOP_ONE = 0x10
         const val LOOP_MODEL_SIMGLE = 0x11
         const val LOOP_MODEL_LOOP_LIST = 0x12
+
+        const val HANDLER_SEEK_TIME = 0x100
     }
 }

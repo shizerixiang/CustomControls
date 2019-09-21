@@ -28,9 +28,6 @@ import com.beviswang.customcontrols.util.BitmapHelper
 import com.beviswang.customcontrols.util.TransitionHelper
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
-import com.bumptech.glide.request.transition.DrawableCrossFadeTransition
 import kotlinx.android.synthetic.main.activity_spectrum.*
 import kotlinx.android.synthetic.main.item_main.view.*
 import kotlinx.android.synthetic.main.layout_tool_bar.*
@@ -81,14 +78,15 @@ class SpectrumActivity : BaseActivity() {
 
     private fun bindData() {
         sv_spectrum1.setRushAnimator()
-//        sv_spectrum2.setSoftAnimator()
+//        sv_spectrum1.setSoftAnimator()
         mMediaPlayer = SimpleMediaPlayer()
         mMediaPlayer?.openVisualizer()
         mMediaPlayer?.addOnPlayChanged { changeScene(it) }
         mMediaPlayer?.addFftListener { v, fft, i ->
             sv_spectrum1.onFftDataCapture(v, fft, i)
-//            sv_spectrum2.onFftDataCapture(v,fft,i)
         }
+        mMediaPlayer?.addSeekListener { sb_spectrum.progress = (sb_spectrum.max * it).toInt() }
+        sb_spectrum.setOnSeekBarChangeListener(mMediaPlayer)
         initMusicList()
     }
 
@@ -122,13 +120,11 @@ class SpectrumActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         sv_spectrum1.resume()
-//        sv_spectrum2.resume()
     }
 
     override fun onPause() {
         super.onPause()
         sv_spectrum1.pause()
-//        sv_spectrum2.pause()
     }
 
     override fun onDestroy() {
