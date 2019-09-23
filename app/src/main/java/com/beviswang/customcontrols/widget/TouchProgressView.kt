@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
 import com.beviswang.customcontrols.graphics.PointHelper
+import com.beviswang.customcontrols.loge
 import com.beviswang.customcontrols.util.SlidingGestureDetector
 
 /**
@@ -39,8 +40,7 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
 
     init {
         mProgressBgPaint.style = Paint.Style.STROKE
-        mProgressBgPaint.color = Color.GRAY
-        mProgressBgPaint.alpha = 128
+        mProgressBgPaint.color = Color.parseColor("#dcdcdc")
         mProgressBgPaint.strokeWidth = 40f
         mProgressBgPaint.strokeCap = Paint.Cap.ROUND
 
@@ -90,11 +90,26 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
         hideProgress()
     }
 
+    private var mLastPointDegree: Float = 0f // 记录的上次手指到达的点的角度
+    private var mCurPointDegree: Float = 0f // 当前角度
+    private var isClockwise: Boolean = false // 是否为顺时针旋转
+    private var mLastProgress: Float = 0f // 上次进度
+
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+        // 未显示、动画未执行完时直接不处理手势
         if (e2 == null || !isShowProgress || mProgressShowAnimatorProgress != 1f) return true
-        if (mProgress > 0.9f && mStartAngle != 0f) return true
-        mProgress = PointHelper.getPointDegree(mCenterPoint, PointF(e2.x, e2.y), 90f) / 360f
-        if (mProgress > 0.9f) doResetAnimator() else invalidate()
+        mCurPointDegree = PointHelper.getPointDegree(mCenterPoint, PointF(e2.x, e2.y), 90f)
+        // 通过差值判断方向
+//        val d = mCurPointDegree - mLastPointDegree
+//        isClockwise = d > 0 && d < 180
+//        mLastPointDegree = mCurPointDegree
+        // 正在执行结束动画
+//        if (mProgress >= 1f && mStartAngle != 0f) return true
+        mProgress = mCurPointDegree / 360f
+        if (mStartAngle != 0f) return true
+        loge("当前进度：$mProgress")
+        if (mProgress < 0.25f && mLastProgress > 0.75f) doResetAnimator() else invalidate()
+        mLastProgress = mProgress
         return true
     }
 
@@ -106,7 +121,7 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
 
     private fun hideProgress() {
         if (!isShowProgress || mProgressShowAnimatorProgress == 0f) return
-        doProgressAnimator(0f, 800)
+        doProgressAnimator(0f, 1200)
     }
 
     private fun doProgressAnimator(endValue: Float, delay: Long = 0) {
@@ -131,11 +146,11 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
         var progress = 0f
         mStartAngle = 1f
         mResetAnimator = ValueAnimator.ofFloat(0f, 1f)
-        mResetAnimator?.duration = 240
+        mResetAnimator?.duration = 180
         mResetAnimator?.addUpdateListener {
             progress = it.animatedValue as Float
             mStartAngle = progress * 360f
-            if (progress > 0.99f) mStartAngle = 0f
+            if (progress == 1f) mStartAngle = 0f
             invalidate()
         }
         mResetAnimator?.interpolator = LinearInterpolator()
@@ -158,10 +173,13 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
         resizeRectFByRadius(mProgressRadius)
         mProgressBgPaint.strokeWidth = mProgressPaintWidth * mProgressShowAnimatorProgress
         mProgressPaint.strokeWidth = mProgressPaintWidth * mProgressShowAnimatorProgress
-        mProgressBgPaint.alpha = (128 * mProgressShowAnimatorProgress).toInt()
+        mProgressBgPaint.alpha = (255 * mProgressShowAnimatorProgress).toInt()
         mProgressPaint.alpha = (255 * mProgressShowAnimatorProgress).toInt()
-        canvas.drawArc(mProgressRectF, 0f, 359 * mProgressShowAnimatorProgress, false, mProgressBgPaint)
-        canvas.drawArc(mProgressRectF, mStartAngle, 359 * mProgress * mProgressShowAnimatorProgress, false, mProgressPaint)
+        canvas.drawArc(mProgressRectF, 0f, 360 * mProgressShowAnimatorProgress, false, mProgressBgPaint)
+        if (mStartAngle > 0f)
+            canvas.drawArc(mProgressRectF, mStartAngle, 360 * mProgress + 360f - mStartAngle, false, mProgressPaint)
+        else
+            canvas.drawArc(mProgressRectF, mStartAngle, 360 * mProgress * mProgressShowAnimatorProgress, false, mProgressPaint)
     }
 
     private fun resizeRectFByRadius(radius: Float) {
