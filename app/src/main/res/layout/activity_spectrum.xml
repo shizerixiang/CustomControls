@@ -29,14 +29,15 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cl_tool_bar" />
 
-    <SeekBar
-        android:id="@+id/sb_spectrum"
+    <com.beviswang.customcontrols.widget.TouchProgressView
+        android:id="@+id/tpv_spectrum"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:max="1000"
-        app:layout_constraintBottom_toTopOf="@+id/rv_spectrum"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        android:layout_height="0dp"
+        android:alpha="0.8"
+        app:layout_constraintBottom_toBottomOf="@+id/sv_spectrum1"
+        app:layout_constraintLeft_toLeftOf="@+id/sv_spectrum1"
+        app:layout_constraintRight_toRightOf="@+id/sv_spectrum1"
+        app:layout_constraintTop_toTopOf="@+id/sv_spectrum1" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_spectrum"

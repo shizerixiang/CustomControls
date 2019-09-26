@@ -26,6 +26,7 @@ import com.beviswang.customcontrols.source.utils.ConverterHelper.ACCURATE_TO_MIN
 import com.beviswang.customcontrols.tansform.GlideRoundTransform
 import com.beviswang.customcontrols.util.BitmapHelper
 import com.beviswang.customcontrols.util.TransitionHelper
+import com.beviswang.customcontrols.widget.TouchProgressView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
 import kotlinx.android.synthetic.main.activity_spectrum.*
@@ -85,8 +86,14 @@ class SpectrumActivity : BaseActivity() {
         mMediaPlayer?.addFftListener { v, fft, i ->
             sv_spectrum1.onFftDataCapture(v, fft, i)
         }
-        mMediaPlayer?.addSeekListener { sb_spectrum.progress = (sb_spectrum.max * it).toInt() }
-        sb_spectrum.setOnSeekBarChangeListener(mMediaPlayer)
+        mMediaPlayer?.addSeekListener { tpv_spectrum.setProgress(it) }
+        tpv_spectrum.addSeekBarChangedListener(object : TouchProgressView.OnProgressChangeListener {
+            override fun onProgressChanged(tpv: TouchProgressView, progress: Float, fromUser: Boolean) {}
+            override fun onStartTouch(tpv: TouchProgressView) {}
+            override fun onStopTouch(tpv: TouchProgressView) {
+                mMediaPlayer?.seekTo(tpv.getProgress())
+            }
+        })
         initMusicList()
     }
 
@@ -100,6 +107,7 @@ class SpectrumActivity : BaseActivity() {
                 .centerCrop().into(iv_spectrum_bg)
         BitmapHelper.getPaletteColor(this@SpectrumActivity, bt, listener = { color ->
             TransitionHelper.changeBgColorAnimator(mTbColor, color, cl_tool_bar)
+            tpv_spectrum.setProgressColor(color)
             mTbColor = color
         })
         mLastBitmap = bt

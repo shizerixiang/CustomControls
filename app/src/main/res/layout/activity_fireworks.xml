@@ -4,29 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.TouchToolActivity">
+    tools:context=".activity.FireworksActivity">
 
     <include layout="@layout/layout_tool_bar" />
 
-    <com.beviswang.customcontrols.widget.TouchProgressView
-        android:id="@+id/tpv_touch_tool"
+    <com.beviswang.customcontrols.widget.FireworksView
+        android:id="@+id/fv_fireworks"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@android:color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cl_tool_bar" />
-
-    <TextView
-        android:id="@+id/tv_touch_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="28sp"
-        android:text="Long Press"
-        android:textColor="#cccccc"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,6 +8,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
+import android.widget.SeekBar
+import androidx.annotation.ColorInt
 import com.beviswang.customcontrols.graphics.PointHelper
 import com.beviswang.customcontrols.loge
 import com.beviswang.customcontrols.util.SlidingGestureDetector
@@ -26,7 +28,8 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
     private var mProgressBgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG) // 总进度画笔
     private var mProgressPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG) // 当前进度画笔
     private var mProgressPaintWidth: Float = 0f // 画笔宽度
-    private var mProgress: Float = 0.4f // 当前进度
+    private var mProgress: Float = 0f // 当前进度
+    private var mTrueProgress: Float = 0f // 非动画进度，即真实进度值（实时）
 
     private var mStartAngle: Float = 0f // 圆环起始点
 
@@ -38,9 +41,23 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
     private var mProgressShowAnimator: ValueAnimator? = null // 进度条显示隐藏动画
     private var mProgressShowAnimatorProgress: Float = 0f // 动画的进度
 
+    private var mCurPointDegree: Float = 0f // 当前角度
+    private var mLastProgress: Float = 0f // 上次进度
+    private var mTouchDegrees = 0f  // 手指滑动的角度，未滑动或滑动进度不足一周都为0，满一周则为 360
+
+    private var mResetAnimator: ValueAnimator? = null // 进度条重置动画
+    private var mSpeed: Float = 1.2f // 跑进度动画的速度 degree/ms
+
+    private var mProgressAnimator: ValueAnimator? = null
+
+    private var mSeekBarListener: OnProgressChangeListener? = null
+
+    private var isLongPress: Boolean = false // 长按判定
+    private var isPress: Boolean = false // 拖动判定
+
     init {
         mProgressBgPaint.style = Paint.Style.STROKE
-        mProgressBgPaint.color = Color.parseColor("#dcdcdc")
+        mProgressBgPaint.color = Color.parseColor("#ffffff")
         mProgressBgPaint.strokeWidth = 40f
         mProgressBgPaint.strokeCap = Paint.Cap.ROUND
 
@@ -69,46 +86,74 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         mCenterPoint.set(w / 2f, h / 2f)
-        mProgressMaxRadius = if (w > h) h / 3f else w / 3f
-        mProgressPaintWidth = mProgressMaxRadius / 2f
+//        mProgressMaxRadius = if (w > h) h / 3f else w / 3f
+        mProgressMaxRadius = 140f
+        mProgressPaintWidth = mProgressMaxRadius / 3f
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?) = mSlidingGestureDetector.onTouchEvent(event)
 
     override fun onDown(e: MotionEvent?): Boolean {
+//        mLastProgress = mProgress // 记录进度
+        if (e == null) return true
+        if (!isShowProgress) mCenterPoint.set(e.x, e.y)
         if (mProgressShowAnimator?.isRunning == true) return true
         mProgressShowAnimator?.cancel()
+        handlerTouch(e)
+        mSeekBarListener?.onStartTouch(this)
+        if (isShowProgress && mProgressShowAnimatorProgress == 1f) isPress = true
         return true
     }
 
     override fun onLongPress(e: MotionEvent?) {
+        isLongPress = true
         showProgress()
     }
 
     override fun onRelease(e: MotionEvent?) {
         hideProgress()
+        isPress = false
+        if (isLongPress) {
+            isLongPress = false
+            return
+        }
+        if (updateTrueProgress(e)) return
+        mSeekBarListener?.onStopTouch(this)
     }
 
-    private var mLastPointDegree: Float = 0f // 记录的上次手指到达的点的角度
-    private var mCurPointDegree: Float = 0f // 当前角度
-    private var isClockwise: Boolean = false // 是否为顺时针旋转
-    private var mLastProgress: Float = 0f // 上次进度
+    private fun updateTrueProgress(e: MotionEvent?): Boolean {
+        if (e == null || !isShowProgress || mProgressShowAnimatorProgress != 1f) return true
+        mCurPointDegree = PointHelper.getPointDegree(mCenterPoint, PointF(e.x, e.y), 90f)
+        mTrueProgress = mCurPointDegree / 360f
+        return false
+    }
 
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+        val isHandler = handlerTouch(e2)
+        mSeekBarListener?.onProgressChanged(this, mProgress, true)
+        return isHandler
+    }
+
+    private fun handlerTouch(e2: MotionEvent?): Boolean {
         // 未显示、动画未执行完时直接不处理手势
         if (e2 == null || !isShowProgress || mProgressShowAnimatorProgress != 1f) return true
+        // 正在执行进度动画
+        if (mProgressAnimator?.isRunning == true) return true
         mCurPointDegree = PointHelper.getPointDegree(mCenterPoint, PointF(e2.x, e2.y), 90f)
-        // 通过差值判断方向
-//        val d = mCurPointDegree - mLastPointDegree
-//        isClockwise = d > 0 && d < 180
-//        mLastPointDegree = mCurPointDegree
-        // 正在执行结束动画
-//        if (mProgress >= 1f && mStartAngle != 0f) return true
         mProgress = mCurPointDegree / 360f
+        mTrueProgress = mProgress
         if (mStartAngle != 0f) return true
         loge("当前进度：$mProgress")
-        if (mProgress < 0.25f && mLastProgress > 0.75f) doResetAnimator() else invalidate()
+        // 当前滑动超过一周
+        if (mProgress < 0.2f && mLastProgress > 0.8f) doResetAnimator()
+        // 当前滑动距离过大
+        else if (Math.abs(mProgress - mLastProgress) > 0.2) {
+            doProgressAnimator(mLastProgress, mProgress)
+            return true
+        }
+        // 没有特殊情况
+        else invalidate()
         mLastProgress = mProgress
         return true
     }
@@ -116,15 +161,15 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
     private fun showProgress() {
         isShowProgress = true
         if (!isShowProgress || mProgressShowAnimatorProgress == 1f) return
-        doProgressAnimator(1f)
+        doStateAnimator(1f)
     }
 
     private fun hideProgress() {
         if (!isShowProgress || mProgressShowAnimatorProgress == 0f) return
-        doProgressAnimator(0f, 1200)
+        doStateAnimator(0f, 1800)
     }
 
-    private fun doProgressAnimator(endValue: Float, delay: Long = 0) {
+    private fun doStateAnimator(endValue: Float, delay: Long = 0) {
         mProgressShowAnimator?.cancel()
         mProgressShowAnimator = ValueAnimator.ofFloat(mProgressShowAnimatorProgress, endValue)
         mProgressShowAnimator?.duration = 240
@@ -138,23 +183,40 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
         mProgressShowAnimator?.start()
     }
 
-    private var mResetAnimator: ValueAnimator? = null
-
     private fun doResetAnimator() {
         if (mStartAngle != 0f) return
         mResetAnimator?.cancel()
         var progress = 0f
         mStartAngle = 1f
         mResetAnimator = ValueAnimator.ofFloat(0f, 1f)
-        mResetAnimator?.duration = 180
+        mResetAnimator?.duration = (360f / mSpeed).toLong()
+        mTouchDegrees = 360f
         mResetAnimator?.addUpdateListener {
             progress = it.animatedValue as Float
             mStartAngle = progress * 360f
-            if (progress == 1f) mStartAngle = 0f
+            if (progress == 1f) {
+                mTouchDegrees = 0f
+                mStartAngle = 0f
+            }
             invalidate()
         }
         mResetAnimator?.interpolator = LinearInterpolator()
         mResetAnimator?.start()
+    }
+
+    private fun doProgressAnimator(startProgress: Float, endProgress: Float) {
+        mProgressAnimator?.cancel()
+        mProgressAnimator = ValueAnimator.ofFloat(startProgress, endProgress)
+        // 动画时间通过进度计算，定义一个速度值，单位 degree/ms
+        mProgressAnimator?.duration = (360f * Math.abs(endProgress - startProgress) / mSpeed).toLong()
+        mProgressAnimator?.addUpdateListener {
+            mProgress = it.animatedValue as Float
+            mSeekBarListener?.onProgressChanged(this, mProgress, true)
+            invalidate()
+            mLastProgress = mProgress
+        }
+        mProgressAnimator?.interpolator = LinearInterpolator()
+        mProgressAnimator?.start()
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -176,10 +238,7 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
         mProgressBgPaint.alpha = (255 * mProgressShowAnimatorProgress).toInt()
         mProgressPaint.alpha = (255 * mProgressShowAnimatorProgress).toInt()
         canvas.drawArc(mProgressRectF, 0f, 360 * mProgressShowAnimatorProgress, false, mProgressBgPaint)
-        if (mStartAngle > 0f)
-            canvas.drawArc(mProgressRectF, mStartAngle, 360 * mProgress + 360f - mStartAngle, false, mProgressPaint)
-        else
-            canvas.drawArc(mProgressRectF, mStartAngle, 360 * mProgress * mProgressShowAnimatorProgress, false, mProgressPaint)
+        canvas.drawArc(mProgressRectF, mStartAngle, 360 * mProgress * mProgressShowAnimatorProgress + mTouchDegrees - mStartAngle, false, mProgressPaint)
     }
 
     private fun resizeRectFByRadius(radius: Float) {
@@ -187,13 +246,35 @@ class TouchProgressView @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     /** 主动隐藏进度条 */
-    fun hide() = doProgressAnimator(0f)
+    fun hide() = doStateAnimator(0f)
 
     /** 主动显示进度条 */
     fun show() = showProgress()
 
-    /** 设置进度值 */
+    /** 设置进度值 百分比 */
     fun setProgress(p: Float) {
         mProgress = p
+        mTrueProgress = mProgress
+        if (!isPress) invalidate()
+        mSeekBarListener?.onProgressChanged(this, mProgress, false)
+    }
+
+    /** 设置进度条颜色 */
+    fun setProgressColor(@ColorInt color: Int) {
+        mProgressPaint.color = color
+    }
+
+    /** 获取进度值 */
+    fun getProgress() = mTrueProgress
+
+    /** 监听进度 */
+    fun addSeekBarChangedListener(listener: OnProgressChangeListener) {
+        mSeekBarListener = listener
+    }
+
+    interface OnProgressChangeListener {
+        fun onProgressChanged(tpv: TouchProgressView, progress: Float, fromUser: Boolean)
+        fun onStartTouch(tpv: TouchProgressView)
+        fun onStopTouch(tpv: TouchProgressView)
     }
 }

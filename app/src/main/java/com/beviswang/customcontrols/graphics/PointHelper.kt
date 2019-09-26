@@ -79,8 +79,15 @@ object PointHelper {
         val vk = y / (x - dx)
         val m = dx * y / (dx - x)
         // 切线的直线公式：ty = vk * tx + m
-        val tp = getPointByDistance(PointF(x, y), vk.toFloat(), m.toFloat(), distance, direction)
+        val tp = getPointByDirection(PointF(x, y), vk.toFloat(), m.toFloat(), distance, direction)
         return PointF(tp.x + o.x, tp.y + o.y)
+    }
+
+    private fun getPointByDirection(sp:PointF, k:Float, m:Float, distance:Float, isXIncreasingDir:Boolean):PointF{
+        val absX = distance / Math.sqrt(1 + Math.pow(k.toDouble(), 2.0)).toFloat() + sp.x
+        val tx = if (if (isXIncreasingDir) sp.y < 0 else sp.y > 0) absX else getMirrorValue(sp.x, absX)
+        val ty = k * tx + m
+        return PointF(tx, ty)
     }
 
     /**
@@ -95,7 +102,6 @@ object PointHelper {
      */
     fun getPointByDistance(sp: PointF, k: Float, m: Float, distance: Float, isXIncreasingDir: Boolean): PointF {
         val absX = distance / Math.sqrt(1 + Math.pow(k.toDouble(), 2.0)).toFloat() + sp.x
-//        val tx = if (if (isXIncreasingDir) sp.y < 0 else sp.y > 0) absX else getMirrorValue(sp.x, absX)
         val tx = if (isXIncreasingDir) absX else getMirrorValue(sp.x, absX)
         val ty = k * tx + m
         return PointF(tx, ty)
