@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoTitle"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.FireworksActivity"></activity>
+        <activity android:name=".activity.SmearActivity"></activity>
+        <activity android:name=".activity.FireworksActivity" />
         <activity android:name=".activity.TouchToolActivity" />
         <activity android:name=".activity.SpectrumActivity" /> <!-- 贝塞尔曲线演示 -->
         <activity android:name=".activity.BezierActivity" /> <!-- 混合图形 -->

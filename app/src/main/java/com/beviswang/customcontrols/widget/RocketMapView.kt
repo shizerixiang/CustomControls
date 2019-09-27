@@ -54,6 +54,10 @@ class RocketMapView @JvmOverloads constructor(context: Context, attrs: Attribute
         }
     }
 
+    fun setSpeed(speed: Float) {
+        mRocketList.forEach { it.setSpeed(speed) }
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         // 针对 wrap_content 的处理，使 wrap_content 生效
@@ -138,6 +142,8 @@ class RocketMapView @JvmOverloads constructor(context: Context, attrs: Attribute
 
         private var pathPaint: Paint
 
+        private var mFlySpeed: Float = 2f // 火箭飞行速度 px/ms
+
         init {
             centerPoint = PointF(map.width / 2f, map.height / 2f)
             val bitmap = BitmapFactory.decodeResource(context.resources, bodyRes)
@@ -163,6 +169,12 @@ class RocketMapView @JvmOverloads constructor(context: Context, attrs: Attribute
             doNormalFly()
         }
 
+        /** 设置飞行速度 */
+        fun setSpeed(speed: Float) {
+            mFlySpeed = speed
+            flyAuto()
+        }
+
         /** 执行普通指令 */
         private fun doNormalFly() {
             state = ROCKET_STATE_NORMAL_ORDER
@@ -177,7 +189,7 @@ class RocketMapView @JvmOverloads constructor(context: Context, attrs: Attribute
                 map.invalidate()
             }
             normalOrderAnimator?.interpolator = LinearInterpolator()
-            normalOrderAnimator?.duration = 1800
+            normalOrderAnimator?.duration = (normalOrder.getTotalDistance() / mFlySpeed).toLong()
             normalOrderAnimator?.repeatCount = ValueAnimator.INFINITE
             normalOrderAnimator?.start()
         }
@@ -208,7 +220,7 @@ class RocketMapView @JvmOverloads constructor(context: Context, attrs: Attribute
                     // C 式
                     etp.x = target.x - (stp.x - sp.x)
                     etp.y = target.y - (stp.y - sp.y)
-                    // S 式
+                    // S 式路径
 //                    etp.x = target.x + (stp.x - sp.x)
 //                    etp.y = target.y + (stp.y - sp.y)
                     urgentOrder = UrgentOrder(sp, target, etp, stp)
@@ -234,7 +246,7 @@ class RocketMapView @JvmOverloads constructor(context: Context, attrs: Attribute
                     // C 式
                     stp.x = sp.x - (etp.x - target.x)
                     stp.y = sp.y - (etp.y - target.y)
-                    // S 式
+                    // S 式路径
 //                    stp.x = sp.x + (etp.x - target.x)
 //                    stp.y = sp.y + (etp.y - target.y)
                     urgentOrder = UrgentOrder(sp, target, etp, stp)
@@ -265,7 +277,7 @@ class RocketMapView @JvmOverloads constructor(context: Context, attrs: Attribute
                 }
             }
             urgentOrderAnimator?.interpolator = LinearInterpolator()
-            urgentOrderAnimator?.duration = 1000
+            urgentOrderAnimator?.duration = (urgentOrder!!.getTotalDistance() / mFlySpeed).toLong()
             urgentOrderAnimator?.start()
         }
 

@@ -12,8 +12,8 @@ import android.graphics.PointF
 class LinearEquation private constructor() : IEquation {
     private var p1: PointF? = null
     private var p2: PointF? = null
-    private var k: Float = 0f   // 斜率
-    private var b: Float = 0f   // 偏移量
+    var k: Float = 0f   // 斜率
+    var b: Float = 0f   // 偏移量
 
     constructor(k: Float, b: Float) : this() {
         setKB(k, b)
@@ -87,5 +87,29 @@ class LinearEquation private constructor() : IEquation {
         path.reset()
         path.moveTo(p1!!.x, p1!!.y)
         path.lineTo(p2!!.x, p2!!.y)
+    }
+
+    /**
+     * 获取经过指定点并垂直于该直线的直线方程
+     * @param p 垂线经过的点
+     * @return 经过指定点的该直线的垂线
+     */
+    fun getVerticalLinearEquation(p: PointF): LinearEquation {
+        val vk = -1 / k
+        val vb = p.y - (vk * p.x)
+        return LinearEquation(vk, vb)
+    }
+
+    /**
+     * 通过点和距离，获取直线上的另外两点
+     * @param p 中点
+     * @param distance 距离
+     * @return 在这条直线上，离中点距离相等两点
+     */
+    fun getPointsByDistance(p: PointF, distance: Float): Array<PointF> {
+        val pArray = EquationHelper.getPointsByDistanceInLine(this, distance, p)
+        p1 = pArray[0]
+        p2 = pArray[1]
+        return pArray
     }
 }

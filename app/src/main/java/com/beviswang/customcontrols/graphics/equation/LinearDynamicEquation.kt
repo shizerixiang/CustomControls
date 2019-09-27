@@ -13,8 +13,8 @@ import com.beviswang.customcontrols.graphics.PointHelper
 class LinearDynamicEquation private constructor() : IEquation {
     private var p1: PointF = PointF()
     private var p2: PointF = PointF()
-    private var k: Float = 0f   // 斜率
-    private var b: Float = 0f   // 偏移量
+    var k: Float = 0f   // 斜率
+    var b: Float = 0f   // 偏移量
 
     constructor(p1: PointF, p2: PointF) : this() {
         set2Point(p1, p2)

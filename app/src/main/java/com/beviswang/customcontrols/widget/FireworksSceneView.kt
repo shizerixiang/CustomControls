@@ -2,6 +2,8 @@ package com.beviswang.customcontrols.widget
 
 import android.content.Context
 import android.graphics.*
+import android.os.Handler
+import android.os.Message
 import android.util.AttributeSet
 import android.view.View
 import androidx.palette.graphics.Palette
@@ -14,7 +16,7 @@ import com.beviswang.customcontrols.util.BitmapHelper
  * @author BevisWang
  * @date 2019/9/26 11:39
  */
-class FireworksView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, def: Int = 0)
+class FireworksSceneView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, def: Int = 0)
     : View(context, attrs, def) {
     private val mDefWidth: Int = 300
     private val mDefHeight: Int = 300
@@ -26,6 +28,8 @@ class FireworksView @JvmOverloads constructor(context: Context, attrs: Attribute
     private var mBitmapPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private var mBitmap: Bitmap? = null
+
+    private var mFireworks: Fireworks
 
     init {
         mFireworksPaint.color = Color.WHITE
@@ -46,6 +50,8 @@ class FireworksView @JvmOverloads constructor(context: Context, attrs: Attribute
             mBitmapPaint.color = it?.lightVibrantSwatch?.rgb ?: Color.WHITE
             invalidate()
         }
+
+        mFireworks = Fireworks()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
