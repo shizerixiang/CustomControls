@@ -16,10 +16,6 @@ object EquationHelper {
      * @return 对应线条上的两点
      */
     fun getPointsByDistanceInLine(line: LinearEquation, distance: Float, p: PointF): Array<PointF> {
-//        val x1 = distance / Math.sqrt(1 + Math.pow(line.k.toDouble(), 2.0)).toFloat() + p.x
-//        val x2 = PointHelper.getMirrorValue(p.x, x1)
-//        return arrayOf(PointF(x1, line.k * x1 + line.b), PointF(x2, line.k * x2 + line.b))
-
         /**
          * 设定基点在原点 o 上，则得到经过基点的直线公式为 y = kx
          * 由斜率 k = tanA = y/x 三角函数可得出：distance^2 = k^2*x^2+x^2 = x^2(k^2+1)
