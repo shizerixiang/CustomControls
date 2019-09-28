@@ -2,6 +2,7 @@ package com.beviswang.customcontrols.graphics.equation
 
 import android.graphics.Path
 import android.graphics.PointF
+import com.beviswang.customcontrols.loge
 
 /**
  * 直线方程（静态，比较节省性能，但无法动态根据点更新方程）
@@ -10,8 +11,8 @@ import android.graphics.PointF
  * @date 2019/9/9 16:44
  */
 class LinearEquation private constructor() : IEquation {
-    private var p1: PointF? = null
-    private var p2: PointF? = null
+    var p1: PointF? = null
+    var p2: PointF? = null
     var k: Float = 0f   // 斜率
     var b: Float = 0f   // 偏移量
 
@@ -96,6 +97,7 @@ class LinearEquation private constructor() : IEquation {
      */
     fun getVerticalLinearEquation(p: PointF): LinearEquation {
         val vk = -1 / k
+        loge("k = $k    vk = $vk")
         val vb = p.y - (vk * p.x)
         return LinearEquation(vk, vb)
     }

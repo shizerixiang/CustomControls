@@ -48,7 +48,8 @@ class MainActivity : BaseActivity() {
                 getDescModel("音频频谱演示", "View 绘制", SpectrumActivity::class.java, imgPath = R.mipmap.img_spectrum),
                 getDescModel("触摸控件演示", "View 绘制 | 手势控制", TouchToolActivity::class.java, imgPath = R.mipmap.img_touch_progress),
                 getDescModel("拖影绘制", "View 绘制", SmearActivity::class.java, imgPath = R.mipmap.img_touch_progress),
-                getDescModel("烟花绘制", "View 绘制", FireworksActivity::class.java, imgPath = R.mipmap.img_touch_progress))
+                getDescModel("烟花绘制", "View 绘制", FireworksActivity::class.java, imgPath = R.mipmap.img_touch_progress),
+                getDescModel("控件演示", "自定义控件", ControllerActivity::class.java, imgPath = R.mipmap.ic_rocket))
         mLayoutManager = LinearLayoutManager(baseContext, RecyclerView.VERTICAL, false)
         mAdapter = MainAdapter(baseContext, mDataList)
     }
