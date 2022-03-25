@@ -17,6 +17,7 @@ import com.beviswang.customcontrols.util.BitmapHelper
 import com.beviswang.customcontrols.util.ViewHelper
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import kotlin.math.atan2
 
 /**
  * 飞行的火箭
@@ -397,7 +398,7 @@ class RocketMapView @JvmOverloads constructor(context: Context, attrs: Attribute
                 val pos = floatArrayOf(0f, 0f)
                 val tan = floatArrayOf(0f, 0f)
                 pathMeasure.getPosTan(totalDistance * progress, pos, tan)
-                val degrees: Float = (Math.atan2(tan[1].toDouble(), tan[0].toDouble()) * 180f / Math.PI).toFloat()
+                val degrees: Float = (atan2(tan[1].toDouble(), tan[0].toDouble()) * 180f / Math.PI).toFloat()
                 Log.e("点的角度", "degrees=$degrees")
                 return PointF(pos[0], pos[1])
             }

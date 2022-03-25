@@ -21,6 +21,34 @@
         <attr name="zoomTabDefaultSelected" format="integer" />
     </declare-styleable>
 
+    <!-- WaveTabLayout 的自定义属性 -->
+    <declare-styleable name="WaveTabLayout">
+        <!-- TabLayout 背景色 -->
+        <attr name="bgColor" format="color|dimension" />
+        <!-- Tab 选中图标颜色 -->
+        <attr name="selectedColor" format="color|dimension" />
+        <!-- Tab 间的距离 -->
+        <attr name="tabPaddingTop" format="dimension" />
+        <!-- Tab 未选中图标颜色 -->
+        <attr name="unselectColor" format="color|dimension" />
+        <!-- Tab 默认选中项 -->
+        <attr name="defaultSelectedIndex" format="integer" />
+    </declare-styleable>
+
+    <!-- AbnormalTabLayout 的自定义属性 -->
+    <declare-styleable name="AbnormalTabLayout">
+        <!-- TabLayout 背景色 -->
+        <attr name="atl_bgColor" format="color|dimension" />
+        <!-- Tab 选中图标颜色 -->
+        <attr name="atl_selectedColor" format="color|dimension" />
+        <!-- Tab 间的距离 -->
+        <attr name="atl_tabPaddingTop" format="dimension" />
+        <!-- Tab 未选中图标颜色 -->
+        <attr name="atl_unselectColor" format="color|dimension" />
+        <!-- Tab 默认选中项 -->
+        <attr name="atl_defaultSelectedIndex" format="integer" />
+    </declare-styleable>
+
     <!-- 带特效的小球属性 -->
     <declare-styleable name="RocketMapView">
         <attr name="colorLine" format="color" />

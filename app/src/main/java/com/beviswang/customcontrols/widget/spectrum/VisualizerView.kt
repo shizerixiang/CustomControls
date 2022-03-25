@@ -7,6 +7,8 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.animation.LinearInterpolator
+import com.beviswang.customcontrols.loge
+import java.lang.StringBuilder
 
 open class VisualizerView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, def: Int = 0)
     : View(context, attrs, def), Visualizer.OnDataCaptureListener {
@@ -69,6 +71,9 @@ open class VisualizerView @JvmOverloads constructor(context: Context, attrs: Att
     override fun onFftDataCapture(visualizer: Visualizer?, fft: ByteArray?, samplingRate: Int) {
         if (fft == null || mIsDetached) return
         notifySpectrum(fft)
+//        val str = StringBuilder("fft[]： ")
+//        fft.map { it.toInt() }.forEach { str.append("$it,") }
+//        loge(str.toString())
     }
 
     override fun onWaveFormDataCapture(visualizer: Visualizer?, waveform: ByteArray?, samplingRate: Int) {}

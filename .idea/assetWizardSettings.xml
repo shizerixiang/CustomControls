@@ -28,9 +28,10 @@
                         </option>
                         <option name="values">
                           <map>
+                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="202043" />
-                            <entry key="outputName" value="ic_play" />
-                            <entry key="sourceFile" value="C:\Users\shize\Desktop\switch.svg" />
+                            <entry key="outputName" value="ic_tab_world_selected" />
+                            <entry key="sourceFile" value="D:\AndroidProject\park_game_app\素材\ss\ic_tab_world_selected.svg" />
                           </map>
                         </option>
                       </PersistentState>
