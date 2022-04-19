@@ -7,10 +7,14 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import androidx.annotation.DrawableRes
+import androidx.vectordrawable.graphics.drawable.ArgbEvaluator
 import com.beviswang.customcontrols.R
+import com.beviswang.customcontrols.graphics.evaluator.ColorEvaluator
 import com.beviswang.customcontrols.graphics.path.ViewPath
+import com.beviswang.customcontrols.loge
 import org.jetbrains.anko.dip
 import java.lang.Math.abs
 
@@ -29,7 +33,9 @@ class AbnormalTabLayout @JvmOverloads constructor(
 
     // 动画
     private var mDrawingAnimator: ValueAnimator? = null
+    private var mArgbAnimator: ValueAnimator? = null
 
+    private var mShaderPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var mBgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var mBgRectF: RectF = RectF()
     private var mBgPath: Path = Path()
@@ -60,6 +66,12 @@ class AbnormalTabLayout @JvmOverloads constructor(
     private var mStayTabCPoint: PointF = PointF() // Tab 常驻位置
     private var mDoTabCPoint: PointF = PointF() // 做动画时 Tab 的位置
 
+    private var mTabShaderX: Float = 0f
+    private var mTabShaderY: Float = 4f
+    private var mTabShaderAlpha: Float = 0.1f
+
+    private var mTabSelectedChangedListener: (Int) -> Unit = {}
+
     init {
         initParams(context, attrs)
         mBgPaint.color = mBgColor
@@ -67,9 +79,14 @@ class AbnormalTabLayout @JvmOverloads constructor(
 
         mTabPaint.color = mUnSelectColor
         mTabPaint.style = Paint.Style.FILL_AND_STROKE
+
+        mShaderPaint.color = Color.BLACK
+        mShaderPaint.alpha = (255 * mTabShaderAlpha).toInt()
+        mShaderPaint.style = Paint.Style.FILL_AND_STROKE
+        mShaderPaint.maskFilter = BlurMaskFilter(12f, BlurMaskFilter.Blur.NORMAL)
     }
 
-    fun newTab(@DrawableRes drawableId: Int):AbnormalTab {
+    fun newTab(@DrawableRes drawableId: Int): AbnormalTab {
         return AbnormalTab().apply {
             parent = this@AbnormalTabLayout
             setDrawableId(drawableId)
@@ -84,8 +101,16 @@ class AbnormalTabLayout @JvmOverloads constructor(
         if (index == mSelectIndex) return
         mSelectIndex = index
         updateTabs()
-        mCurArcX = mTabArray[mSelectIndex].centerPos.x
-        doSelectAnimation(mTabArray[mOldSelectIndex].centerPos.x, mCurArcX)
+        // 会导致中断移动发生位置偏移，根本原因就是动画中的移动均为真实移动
+//        mCurArcX = mTabArray[mSelectIndex].centerPos.x
+//        doSelectAnimation(mTabArray[mOldSelectIndex].centerPos.x, mCurArcX)
+        mCurArcX = mTabWidth * mSelectIndex + (mTabWidth / 2)
+        doSelectAnimation(mTabWidth * mOldSelectIndex + (mTabWidth / 2), mCurArcX)
+        mTabSelectedChangedListener(mSelectIndex)
+    }
+
+    fun setOnTabSelectedChanged(listener: (Int) -> Unit) {
+        mTabSelectedChangedListener = listener
     }
 
     private fun initParams(context: Context, attrs: AttributeSet?) {
@@ -120,26 +145,30 @@ class AbnormalTabLayout @JvmOverloads constructor(
         }
     }
 
+    private var mTempIndex: Int = -1
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event == null) return super.onTouchEvent(event)
+        if (event.y < mTabPaddingTop) { // 没有触碰到 Tab 本身
+            return super.onTouchEvent(event)
+        }
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
+                mTempIndex = -1
             }
             MotionEvent.ACTION_MOVE -> {
             }
             MotionEvent.ACTION_UP -> {
-                if (event.y < mTabPaddingTop) {
-                    return super.onTouchEvent(event)
-                }
                 mOldSelectIndex = mSelectIndex
-                when {
-                    event.x < mTabWidth -> selectTab(0)
-                    event.x < 2 * mTabWidth -> selectTab(1)
-                    event.x < 3 * mTabWidth -> selectTab(2)
-                    event.x < 4 * mTabWidth -> selectTab(3)
-                    else -> selectTab(mSelectIndex)
+                mTempIndex = (event.x / mTabWidth).toInt()
+                if (mTempIndex > mTabArray.lastIndex) {
+                    mTempIndex = mTabArray.lastIndex
                 }
+                if (mTempIndex < 0) {
+                    mTempIndex = 0
+                }
+                selectTab(mTempIndex)
             }
             MotionEvent.ACTION_CANCEL -> {
             }
@@ -208,22 +237,84 @@ class AbnormalTabLayout @JvmOverloads constructor(
         mBgPath.lineTo(mBgRectF.right, mBgRectF.bottom)
         mBgPath.lineTo(mBgRectF.left, mBgRectF.bottom)
         mBgPath.close()
+        mShaderPaint.alpha = (mTabShaderAlpha * 64).toInt()
+        canvas.translate(0f, -4f)
+        canvas.drawPath(mBgPath, mShaderPaint)
+        canvas.translate(0f, 4f)
         canvas.drawPath(mBgPath, mBgPaint)
     }
 
+    private var mTabRectRadius: Float = 0f
+
     private fun drawTabs(canvas: Canvas) {
+        canvas.translate(0f, 4f)
+//        mTabRectRadius = mTabRadius * (1 - (mProgress * 0.5f))
+        mTabRectRadius = mTabRadius * (1 - mProgress)
         mTabArray.forEachIndexed { index, tab ->
             if (index == mSelectIndex) {
                 mTabPaint.color = mBgColor
-                canvas.drawCircle(tab.centerPos.x, tab.centerPos.y, mTabRadius, mTabPaint)
-                tab.drawable?.setTint(mSelectedColor)
+                // 绘制 Tab 阴影
+                mShaderPaint.alpha = ((1 - mProgress) * mTabShaderAlpha * 255).toInt()
+                canvas.drawRoundRect(
+                    tab.centerPos.x - mTabRadius + mTabShaderX,
+                    tab.centerPos.y - mTabRadius + mTabShaderY,
+                    tab.centerPos.x + mTabRadius + mTabShaderX,
+                    tab.centerPos.y + mTabRadius + mTabShaderY,
+                    mTabRectRadius,
+                    mTabRectRadius,
+                    mShaderPaint
+                )
+                // 绘制 Tab 背景
+                canvas.drawRoundRect(
+                    tab.centerPos.x - mTabRadius,
+                    tab.centerPos.y - mTabRadius,
+                    tab.centerPos.x + mTabRadius,
+                    tab.centerPos.y + mTabRadius,
+                    mTabRectRadius,
+                    mTabRectRadius,
+                    mTabPaint
+                )
+                // 为 Tab 染色
+                tab.drawable?.setTint(
+                    ColorEvaluator.getInstance().evaluate(mProgress, mSelectedColor, mUnSelectColor)
+                )
             } else {
                 mTabPaint.color = mBgColor
-                canvas.drawCircle(tab.centerPos.x, tab.centerPos.y, mTabRadius, mTabPaint)
-                tab.drawable?.setTint(mUnSelectColor)
+                // 绘制 Tab 阴影
+                if (index == mOldSelectIndex) {
+                    mShaderPaint.alpha = (mProgress * mTabShaderAlpha * 255).toInt()
+                    canvas.drawRoundRect(
+                        tab.centerPos.x - mTabRadius + mTabShaderX,
+                        tab.centerPos.y - mTabRadius + mTabShaderY,
+                        tab.centerPos.x + mTabRadius + mTabShaderX,
+                        tab.centerPos.y + mTabRadius + mTabShaderY,
+                        mTabRadius - mTabRectRadius,
+                        mTabRadius - mTabRectRadius,
+                        mShaderPaint
+                    )
+                    // 为 Tab 染色
+                    tab.drawable?.setTint(
+                        ColorEvaluator.getInstance()
+                            .evaluate(mProgress, mUnSelectColor, mSelectedColor)
+                    )
+                    // 绘制 Tab 背景
+                    canvas.drawRoundRect(
+                        tab.centerPos.x - mTabRadius,
+                        tab.centerPos.y - mTabRadius,
+                        tab.centerPos.x + mTabRadius,
+                        tab.centerPos.y + mTabRadius,
+                        mTabRadius - mTabRectRadius,
+                        mTabRadius - mTabRectRadius,
+                        mTabPaint
+                    )
+                } else {
+                    // 为 Tab 染色
+                    tab.drawable?.setTint(mUnSelectColor)
+                }
             }
             tab.draw(canvas)
         }
+        canvas.translate(0f, -4f)
     }
 
     private fun updateTabs() {
@@ -258,10 +349,11 @@ class AbnormalTabLayout @JvmOverloads constructor(
     }
 
     private fun doSelectAnimation(startX: Float, endX: Float) {
+        loge("startX=$startX   endX=$endX")
         val dx = endX - startX
         mDrawingAnimator?.cancel()
         mDrawingAnimator = ValueAnimator.ofFloat(startX, endX)
-        mDrawingAnimator?.duration = 320
+        mDrawingAnimator?.duration = 380
         mDrawingAnimator?.interpolator = OvershootInterpolator()
 //        mDrawingAnimator?.interpolator = AccelerateDecelerateInterpolator()
         mDrawingAnimator?.repeatMode = ValueAnimator.RESTART

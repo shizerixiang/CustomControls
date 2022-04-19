@@ -4,25 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F8F8F8"
     tools:context=".activity.ControllerActivity">
 
-    <include layout="@layout/layout_tool_bar" />
-
-    <com.beviswang.customcontrols.widget.InterestingSelectorView
-        android:id="@+id/isv_controller"
-        android:layout_width="0dp"
+    <FrameLayout
+        android:id="@+id/fl_controller"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="32dp"
-        app:layout_constraintBottom_toTopOf="@+id/otv_controller"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cl_tool_bar" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.beviswang.customcontrols.widget.adnormal.AbnormalTabLayout
         android:id="@+id/otv_controller"
         android:layout_width="match_parent"
         android:layout_height="64dp"
-        app:atl_bgColor="#EEEEEE"
+        android:paddingTop="2dp"
+        app:atl_bgColor="#FFFFFF"
         app:atl_selectedColor="#FF6038"
         app:atl_unselectColor="#333333"
         app:layout_constraintBottom_toBottomOf="parent"

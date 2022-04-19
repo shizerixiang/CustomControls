@@ -5,8 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.transition.TransitionInflater
 
 import com.beviswang.customcontrols.R
+import com.beviswang.customcontrols.loge
+import com.beviswang.customcontrols.util.TransitionHelper.startLayoutAnimator
 import kotlinx.android.synthetic.main.fragment_a.*
 
 /**
@@ -22,14 +25,18 @@ class AFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sharedElementEnterTransition =
+            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_a, container, false)
     }
@@ -39,13 +46,32 @@ class AFragment : Fragment() {
         initData()
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            cel_fragment.hide()
+            cl_fragment.visibility = View.GONE
+        } else {
+            cel_fragment.show()
+        }
+    }
+
     private fun initData() {
-        text.text = param1 ?: "null"
+        cl_fragment.visibility = View.GONE
+        cel_fragment.loadFinished {
+            cl_fragment.visibility = View.VISIBLE
+            cl_fragment.startLayoutAnimator(
+                R.anim.layout_anim_menu_enter,
+                start = {
+                    loge("startLayoutAnimator-start：$param1")
+                })
+        }
     }
 
     companion object {
         private const val ARG_PARAM1 = "param1"
         private const val ARG_PARAM2 = "param2"
+
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
@@ -56,11 +82,11 @@ class AFragment : Fragment() {
          */
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-                AFragment().apply {
-                    arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
-                    }
+            AFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
                 }
+            }
     }
 }

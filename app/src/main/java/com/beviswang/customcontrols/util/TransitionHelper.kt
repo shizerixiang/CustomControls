@@ -3,7 +3,12 @@ package com.beviswang.customcontrols.util
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.view.View
+import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import androidx.annotation.AnimRes
+import com.beviswang.customcontrols.R
 
 /**
  * 过渡动画辅助工具
@@ -29,5 +34,26 @@ object TransitionHelper {
         animator.setEvaluator(ArgbEvaluator())
         animator.addUpdateListener { animation -> view.setColorFilter(animation.animatedValue as Int) }
         animator.start()
+    }
+
+    /**
+     * 播放布局动画
+     * @param animId 动画 XML 文件
+     */
+    fun ViewGroup.startLayoutAnimator(
+        @AnimRes animId: Int,
+        start: () -> Unit = {},
+        end: () -> Unit = {}
+    ) {
+        layoutAnimation = AnimationUtils.loadLayoutAnimation(context, animId)
+        layoutAnimationListener = object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) = start()
+
+            override fun onAnimationEnd(animation: Animation?) = end()
+
+            override fun onAnimationRepeat(animation: Animation?) {
+            }
+        }
+        startLayoutAnimation()
     }
 }
