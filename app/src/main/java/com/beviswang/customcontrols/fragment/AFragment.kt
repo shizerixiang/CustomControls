@@ -49,23 +49,22 @@ class AFragment : Fragment() {
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (hidden) {
-            cel_fragment.hide()
+            cel_fragment.hide {}
             cl_fragment.visibility = View.GONE
         } else {
-            cel_fragment.show()
+            cel_fragment.show {
+                cl_fragment.visibility = View.VISIBLE
+                cl_fragment.startLayoutAnimator(
+                    R.anim.layout_anim_menu_enter,
+                    start = {
+                        loge("startLayoutAnimator-start：$param1")
+                    })
+            }
         }
     }
 
     private fun initData() {
         cl_fragment.visibility = View.GONE
-        cel_fragment.loadFinished {
-            cl_fragment.visibility = View.VISIBLE
-            cl_fragment.startLayoutAnimator(
-                R.anim.layout_anim_menu_enter,
-                start = {
-                    loge("startLayoutAnimator-start：$param1")
-                })
-        }
     }
 
     companion object {

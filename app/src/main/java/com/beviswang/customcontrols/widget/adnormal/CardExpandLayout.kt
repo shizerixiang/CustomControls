@@ -37,16 +37,16 @@ class CardExpandLayout @JvmOverloads constructor(
         mPaint.strokeWidth = 0.5f
     }
 
-    fun hide() {
+    fun hide(loadFinished: (() -> Unit)? = null) {
         mIsShow = false
         doAnimator(1f, 0f)
-//        mAnimatorProgress = 0f
-//        invalidate()
+        loadFinished(loadFinished ?: return)
     }
 
-    fun show() {
+    fun show(loadFinished: (() -> Unit)? = null) {
         mIsShow = true
         doAnimator(0f, 1f)
+        loadFinished(loadFinished ?: return)
     }
 
     fun loadFinished(block: () -> Unit) {
@@ -92,7 +92,7 @@ class CardExpandLayout @JvmOverloads constructor(
 //        mDrawingAnimator?.repeatCount = ValueAnimator.INFINITE
         mDrawingAnimator?.addUpdateListener {
             mAnimatorProgress = it.animatedValue as Float
-            if (mAnimatorProgress == 1f && mIsShow) {
+            if (mAnimatorProgress == end) {
                 mLoadFinishedListener()
             }
             invalidate()

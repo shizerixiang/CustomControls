@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidProject/CustomControls/app/src/main/res/drawable/bg_tag_red.xml" value="0.2025" />
         <entry key="..\:/AndroidProject/CustomControls/app/src/main/res/drawable/ic_play.xml" value="0.2025" />
         <entry key="..\:/AndroidProject/CustomControls/app/src/main/res/drawable/ic_return.xml" value="0.2025" />
         <entry key="..\:/AndroidProject/CustomControls/app/src/main/res/drawable/ic_switch.xml" value="0.2025" />
@@ -19,6 +20,8 @@
         <entry key="..\:/AndroidProject/CustomControls/app/src/main/res/layout/activity_spectrum.xml" value="0.30097087378640774" />
         <entry key="..\:/AndroidProject/CustomControls/app/src/main/res/layout/fragment_a.xml" value="0.30483112441214194" />
         <entry key="..\:/AndroidProject/CustomControls/app/src/main/res/layout/fragment_b.xml" value="0.30483112441214194" />
+        <entry key="..\:/AndroidProject/CustomControls/app/src/main/res/layout/item_main.xml" value="0.30483112441214194" />
+        <entry key="..\:/AndroidProject/CustomControls/app/src/main/res/layout/item_main2.xml" value="0.30483112441214194" />
         <entry key="..\:/AndroidProject/CustomControls/app/src/main/res/xml/nfc_filter.xml" value="0.30483112441214194" />
       </map>
     </option>
